@@ -109,7 +109,7 @@
                 <h2>Officers</h2>
                 <div class="users-grid">
                     <% officers.forEach(officer=> { %>
-                        <div class="user-card">
+                        <div class="user-card" data-officer-id="<%= officer._id %>" onclick="showOfficerDetails(this)">
                             <div class="user-info">
                                 <h3>
                                     <%= officer.username %>
@@ -121,6 +121,7 @@
                                 </p>
                             </div>
                             <div class="user-actions">
+                                <a href="/profile/<%= officer.username %>" class="btn btn-primary">View Profile</a>
                                 <form action="/delete-user/<%= officer._id %>" method="POST"
                                     onsubmit="return confirm('Are you sure you want to delete this officer?');">
                                     <button type="submit" class="btn btn-danger">Delete</button>
@@ -147,6 +148,7 @@
                                 </p>
                             </div>
                             <div class="user-actions">
+                                <a href="/profile/<%= citizen.username %>" class="btn btn-primary">View Profile</a>
                                 <form action="/delete-user/<%= citizen._id %>" method="POST"
                                     onsubmit="return confirm('Are you sure you want to delete this citizen?');">
                                     <button type="submit" class="btn btn-danger">Delete</button>
@@ -155,6 +157,17 @@
                         </div>
                         <% }); %>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Officer Details Modal -->
+    <div id="officerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Officer Details</h2>
+            <div id="officerDetails" class="officer-details">
+                <!-- Details will be populated by JavaScript -->
             </div>
         </div>
     </div>
@@ -303,6 +316,16 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }
+
+            .user-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border-color: var(--primary-color);
+                background-color: #fff;
             }
 
             .user-info h3 {
@@ -353,6 +376,56 @@
                     grid-template-columns: repeat(2, 1fr);
                 }
             }
+
+            /* Modal Styles */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .modal-content {
+                background-color: #fff;
+                margin: 10% auto;
+                padding: 2rem;
+                border-radius: 8px;
+                width: 80%;
+                max-width: 600px;
+                position: relative;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .close-modal {
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #666;
+            }
+
+            .close-modal:hover {
+                color: #000;
+            }
+
+            .officer-details {
+                margin-top: 1rem;
+            }
+
+            .officer-details p {
+                margin: 0.5rem 0;
+                padding: 0.5rem;
+                border-bottom: 1px solid #eee;
+            }
+
+            .officer-details p:last-child {
+                border-bottom: none;
+            }
         </style>
 
         <%- contentFor('script') %>
@@ -401,6 +474,50 @@
                             legend: {
                                 position: 'bottom'
                             }
+                        }
+                    }
+                });
+
+                // Officer Details Modal
+                document.addEventListener('DOMContentLoaded', function() {
+                    const modal = document.getElementById('officerModal');
+                    const closeModal = document.getElementsByClassName('close-modal')[0];
+                    
+                    // Add click event to all officer cards
+                    const officerCards = document.querySelectorAll('.user-card[data-officer-id]');
+                    officerCards.forEach(card => {
+                        card.addEventListener('click', function(e) {
+                            // Prevent form submission when clicking on the card
+                            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'FORM') {
+                                showOfficerDetails(this);
+                            }
+                        });
+                    });
+
+                    function showOfficerDetails(card) {
+                        const officerId = card.getAttribute('data-officer-id');
+                        const officerName = card.querySelector('h3').textContent.trim();
+                        const officerEmail = card.querySelector('p').textContent.trim();
+                        const officerAge = card.querySelector('p:last-child').textContent.trim();
+
+                        const detailsHtml = `
+                            <p><strong>Username:</strong> ${officerName}</p>
+                            <p><strong>Email:</strong> ${officerEmail}</p>
+                            <p><strong>Age:</strong> ${officerAge}</p>
+                            <p><strong>ID:</strong> ${officerId}</p>
+                        `;
+
+                        document.getElementById('officerDetails').innerHTML = detailsHtml;
+                        modal.style.display = 'block';
+                    }
+
+                    closeModal.onclick = function() {
+                        modal.style.display = 'none';
+                    }
+
+                    window.onclick = function(event) {
+                        if (event.target == modal) {
+                            modal.style.display = 'none';
                         }
                     }
                 });

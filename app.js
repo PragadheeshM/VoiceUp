@@ -196,12 +196,50 @@ app.get('/create', (req, res) => {
 )
 
 app.get("/profile", isLoggedIn, async (req, res) => {
-  let displaydata = await usermodel.find()
-  let user = await usermodel.findOne({ email: req.user.email }).populate("posts")
-  let blogg = await postmodel.find();
-  res.render('profile', { title: 'Profile', user, blogg, displaydata });
-}
-)
+  // If username is not in the token, fetch it from the database
+  if (!req.user.username) {
+    const userFromDb = await usermodel.findById(req.user.userId);
+    if (userFromDb) {
+      req.user.username = userFromDb.username;
+    } else {
+      // If user not found in database, redirect to home
+      return res.redirect('/');
+    }
+  }
+  
+  // Redirect to the username-based profile URL
+  res.redirect(`/profile/${req.user.username}`);
+})
+
+// New username-based profile route
+app.get("/profile/:username", isLoggedIn, async (req, res) => {
+  try {
+    let displaydata = await usermodel.find();
+    let user = await usermodel.findOne({ username: req.params.username }).populate("posts");
+    
+    // If user not found, redirect to the logged-in user's profile
+    if (!user) {
+      // If username is not in the token, fetch it from the database
+      if (!req.user.username) {
+        const userFromDb = await usermodel.findById(req.user.userId);
+        if (userFromDb) {
+          req.user.username = userFromDb.username;
+        } else {
+          // If user not found in database, redirect to home
+          return res.redirect('/');
+        }
+      }
+      return res.redirect(`/profile/${req.user.username}`);
+    }
+    
+    let blogg = await postmodel.find();
+    res.render('profile', { title: 'Profile', user, blogg, displaydata });
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    res.redirect('/');
+  }
+});
+
 app.get('/logout', async (req, res) => {
   res.clearCookie('Token', {
     httpOnly: true,
@@ -264,7 +302,8 @@ app.post('/login', async (req, res) => {
         let token = jwt.sign({
           email: email,
           role: user.role,
-          userId: user._id
+          userId: user._id,
+          username: user.username
         }, "shhh", { expiresIn });
 
         // Set cookie with secure options
