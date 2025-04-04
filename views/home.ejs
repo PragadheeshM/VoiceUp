@@ -17,6 +17,17 @@
         </div>
     </section>
 
+    <% if (locals.error) { %>
+    <div class="alert alert-danger">
+        <div class="alert-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="alert-content">
+            <%= error %>
+        </div>
+    </div>
+    <% } %>
+
     <section class="features-section">
         <h2 class="section-title">Our Services</h2>
         <div class="features-grid">
@@ -37,6 +48,59 @@
                 <h3 class="feature-title">Tax Services</h3>
                 <p class="feature-description">File taxes and manage your tax-related services efficiently</p>
                 <a href="/services" class="feature-link">Learn More →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="tracking-section">
+        <div class="tracking-container">
+            <div class="tracking-content">
+                <h2 class="section-title">Track Your Application Status</h2>
+                <p class="tracking-description">Check the status of your submitted applications in real-time</p>
+                
+                <div class="tracking-form">
+                    <form action="/track-status" method="POST" class="status-form">
+                        <div class="form-group">
+                            <label for="applicationId">Application ID</label>
+                            <input type="text" id="applicationId" name="applicationId" placeholder="Enter your application ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your registered email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Track Status</button>
+                    </form>
+                </div>
+                
+                <div class="tracking-info">
+                    <div class="tracking-card">
+                        <div class="tracking-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="tracking-text">
+                            <h3>Real-time Updates</h3>
+                            <p>Get instant updates on your application status</p>
+                        </div>
+                    </div>
+                    <div class="tracking-card">
+                        <div class="tracking-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="tracking-text">
+                            <h3>Status History</h3>
+                            <p>View the complete history of your application</p>
+                        </div>
+                    </div>
+                    <div class="tracking-card">
+                        <div class="tracking-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="tracking-text">
+                            <h3>Status Notifications</h3>
+                            <p>Receive notifications when your status changes</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -199,6 +263,122 @@
     color: #5a002f;
 }
 
+.tracking-section {
+    margin-bottom: 3rem;
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.tracking-container {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tracking-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tracking-description {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.tracking-form {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 2rem;
+}
+
+.status-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.tracking-info {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.tracking-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 300px;
+}
+
+.tracking-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-right: 1rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--primary-rgb), 0.1);
+    border-radius: 50%;
+}
+
+.tracking-text {
+    text-align: left;
+}
+
+.tracking-text h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.tracking-text p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
 .info-section {
     background: var(--card-bg);
     border-radius: var(--border-radius);
@@ -269,5 +449,41 @@
     .info-stats {
         grid-template-columns: 1fr;
     }
+    
+    .tracking-container {
+        padding: 2rem 1rem;
+    }
+    
+    .tracking-info {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tracking-card {
+        width: 100%;
+    }
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: var(--border-radius);
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-icon {
+    margin-right: 1rem;
+    font-size: 1.25rem;
+}
+
+.alert-content {
+    flex: 1;
 }
 </style> 
