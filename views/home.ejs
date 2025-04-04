@@ -1,489 +1,587 @@
 <%- contentFor('body') %>
-<div class="home-container">
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">Welcome to the Government Portal</h1>
-            <p class="hero-subtitle">Your one-stop platform for government services and information</p>
-            
-            <div class="hero-actions">
-                <% if (locals.user) { %>
-                    <a href="/services" class="btn btn-primary">Access Services</a>
-                    <a href="/currentStatus" class="btn btn-secondary">Check Status</a>
-                <% } else { %>
-                    <a href="/login" class="btn btn-primary">Login</a>
-                    <a href="/create" class="btn btn-secondary">Register</a>
-                <% } %>
-            </div>
-        </div>
-    </section>
+    <div class="home-container">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Welcome to the Government Portal</h1>
+                <p class="hero-subtitle">Your one-stop platform for government services and information</p>
 
-    <% if (locals.error) { %>
-    <div class="alert alert-danger">
-        <div class="alert-icon">
-            <i class="fas fa-exclamation-circle"></i>
-        </div>
-        <div class="alert-content">
-            <%= error %>
-        </div>
+                <div class="hero-actions">
+                    <% if (locals.user) { %>
+                        <a href="/services" class="btn btn-primary">Access Services</a>
+                        <a href="/currentStatus" class="btn btn-secondary">Check Status</a>
+                        <% } else { %>
+                            <a href="/login" class="btn btn-primary">Login</a>
+                            <a href="/create" class="btn btn-secondary">Register</a>
+                            <% } %>
+                </div>
+            </div>
+        </section>
+
+        <% if (locals.error) { %>
+            <div class="alert alert-danger">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <%= error %>
+                </div>
+            </div>
+            <% } %>
+
+                <section class="features-section">
+                    <h2 class="section-title">Our Services</h2>
+                    <div class="complaint-feature">
+                        <div class="feature-highlight">
+                            <div class="feature-icon">📢</div>
+                            <h3 class="feature-title">File Complaints</h3>
+                            <p class="feature-description">Submit and track your complaints for faster resolution with
+                                our streamlined complaint system</p>
+                            <div class="feature-benefits">
+                                <div class="benefit">
+                                    <span class="benefit-icon">✓</span>
+                                    <span class="benefit-text">Quick Submission</span>
+                                </div>
+                                <div class="benefit">
+                                    <span class="benefit-icon">✓</span>
+                                    <span class="benefit-text">Real-time Tracking</span>
+                                </div>
+                                <div class="benefit">
+                                    <span class="benefit-icon">✓</span>
+                                    <span class="benefit-text">Efficient Resolution</span>
+                                </div>
+                            </div>
+                            <a href="/complaints" class="feature-button">File a Complaint</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="tracking-section">
+                    <div class="tracking-container">
+                        <div class="tracking-content">
+                            <h2 class="section-title">Track Your Application Status</h2>
+                            <p class="tracking-description">Check the status of your submitted applications in real-time
+                            </p>
+
+                            <div class="tracking-form">
+                                <form action="/track-status" method="POST" class="status-form">
+                                    <div class="form-group">
+                                        <label for="applicationId">Application ID</label>
+                                        <input type="text" id="applicationId" name="applicationId"
+                                            placeholder="Enter your application ID" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email Address</label>
+                                        <input type="email" id="email" name="email"
+                                            placeholder="Enter your registered email" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Track Status</button>
+                                </form>
+                            </div>
+
+                            <div class="tracking-info">
+                                <div class="tracking-card">
+                                    <div class="tracking-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="tracking-text">
+                                        <h3>Real-time Updates</h3>
+                                        <p>Get instant updates on your application status</p>
+                                    </div>
+                                </div>
+                                <div class="tracking-card">
+                                    <div class="tracking-icon">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <div class="tracking-text">
+                                        <h3>Status History</h3>
+                                        <p>View the complete history of your application</p>
+                                    </div>
+                                </div>
+                                <div class="tracking-card">
+                                    <div class="tracking-icon">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    <div class="tracking-text">
+                                        <h3>Status Notifications</h3>
+                                        <p>Receive notifications when your status changes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="info-section">
+                    <div class="info-content">
+                        <h2 class="section-title">About the Portal</h2>
+                        <p class="info-text">
+                            The Government Portal provides citizens with easy access to government services and
+                            information.
+                            Our platform is designed to streamline administrative processes and improve communication
+                            between
+                            citizens and government agencies. Experience the convenience of managing your
+                            government-related
+                            tasks from the comfort of your home.
+                        </p>
+                        <div class="info-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">24/7</span>
+                                <span class="stat-label">Service Access</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">100%</span>
+                                <span class="stat-label">Secure</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">Fast</span>
+                                <span class="stat-label">Processing</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
     </div>
-    <% } %>
 
-    <section class="features-section">
-        <h2 class="section-title">Our Services</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">📄</div>
-                <h3 class="feature-title">Document Verification</h3>
-                <p class="feature-description">Submit and verify your government documents online with ease</p>
-                <a href="/services" class="feature-link">Learn More →</a>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔑</div>
-                <h3 class="feature-title">License Renewal</h3>
-                <p class="feature-description">Renew your government-issued licenses and permits hassle-free</p>
-                <a href="/services" class="feature-link">Learn More →</a>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3 class="feature-title">Tax Services</h3>
-                <p class="feature-description">File taxes and manage your tax-related services efficiently</p>
-                <a href="/services" class="feature-link">Learn More →</a>
-            </div>
-        </div>
-    </section>
+    <%- contentFor('style') %>
+        <style>
+            .home-container {
+                padding: 2rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
 
-    <section class="tracking-section">
-        <div class="tracking-container">
-            <div class="tracking-content">
-                <h2 class="section-title">Track Your Application Status</h2>
-                <p class="tracking-description">Check the status of your submitted applications in real-time</p>
-                
-                <div class="tracking-form">
-                    <form action="/track-status" method="POST" class="status-form">
-                        <div class="form-group">
-                            <label for="applicationId">Application ID</label>
-                            <input type="text" id="applicationId" name="applicationId" placeholder="Enter your application ID" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" placeholder="Enter your registered email" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Track Status</button>
-                    </form>
-                </div>
-                
-                <div class="tracking-info">
-                    <div class="tracking-card">
-                        <div class="tracking-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="tracking-text">
-                            <h3>Real-time Updates</h3>
-                            <p>Get instant updates on your application status</p>
-                        </div>
-                    </div>
-                    <div class="tracking-card">
-                        <div class="tracking-icon">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <div class="tracking-text">
-                            <h3>Status History</h3>
-                            <p>View the complete history of your application</p>
-                        </div>
-                    </div>
-                    <div class="tracking-card">
-                        <div class="tracking-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="tracking-text">
-                            <h3>Status Notifications</h3>
-                            <p>Receive notifications when your status changes</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            .hero-section {
+                background: linear-gradient(135deg, var(--primary-color), #5a002f);
+                border-radius: var(--border-radius);
+                margin-bottom: 3rem;
+                padding: 4rem 2rem;
+                color: white;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
 
-    <section class="info-section">
-        <div class="info-content">
-            <h2 class="section-title">About the Portal</h2>
-            <p class="info-text">
-                The Government Portal provides citizens with easy access to government services and information.
-                Our platform is designed to streamline administrative processes and improve communication between
-                citizens and government agencies. Experience the convenience of managing your government-related
-                tasks from the comfort of your home.
-            </p>
-            <div class="info-stats">
-                <div class="stat-item">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">Service Access</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">100%</span>
-                    <span class="stat-label">Secure</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">Fast</span>
-                    <span class="stat-label">Processing</span>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="rgba(255,255,255,0.05)"/></svg>');
+                opacity: 0.1;
+            }
 
-<%- contentFor('style') %>
-<style>
-.home-container {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+            .hero-content {
+                position: relative;
+                z-index: 1;
+            }
 
-.hero-section {
-    background: linear-gradient(135deg, var(--primary-color), #5a002f);
-    border-radius: var(--border-radius);
-    margin-bottom: 3rem;
-    padding: 4rem 2rem;
-    color: white;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
+            .hero-title {
+                font-size: 3rem;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                color: white;
+            }
 
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="rgba(255,255,255,0.05)"/></svg>');
-    opacity: 0.1;
-}
+            .hero-subtitle {
+                font-size: 1.25rem;
+                margin-bottom: 2rem;
+                color: rgba(255, 255, 255, 0.9);
+            }
 
-.hero-content {
-    position: relative;
-    z-index: 1;
-}
+            .hero-actions {
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+            }
 
-.hero-title {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: white;
-}
+            .hero-actions .btn {
+                padding: 0.75rem 2rem;
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
 
-.hero-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    color: rgba(255, 255, 255, 0.9);
-}
+            .hero-actions .btn-secondary {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
 
-.hero-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
+            .hero-actions .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
 
-.hero-actions .btn {
-    padding: 0.75rem 2rem;
-    font-size: 1.1rem;
-    font-weight: 500;
-}
+            .section-title {
+                font-size: 2rem;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: 2rem;
+                color: var(--text-color);
+            }
 
-.hero-actions .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
+            .features-section {
+                margin-bottom: 3rem;
+            }
 
-.hero-actions .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
+            .complaint-feature {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
 
-.section-title {
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 2rem;
-    color: var(--text-color);
-}
+            .feature-highlight {
+                background: white;
+                border-radius: 12px;
+                padding: 3rem;
+                text-align: center;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 10px 30px rgba(115, 0, 59, 0.1);
+                max-width: 600px;
+                width: 100%;
+                position: relative;
+                overflow: hidden;
+            }
 
-.features-section {
-    margin-bottom: 3rem;
-}
+            .feature-highlight:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 8px;
+                background: linear-gradient(90deg, #73003b, #ff6b95);
+            }
 
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
+            .feature-highlight:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 40px rgba(115, 0, 59, 0.2);
+            }
 
-.feature-card {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: var(--card-shadow);
-}
+            .feature-icon {
+                font-size: 4rem;
+                color: #73003b;
+                margin-bottom: 1.5rem;
+                display: inline-block;
+                animation: pulse 2s infinite;
+            }
 
-.feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
 
-.feature-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
+                50% {
+                    transform: scale(1.1);
+                }
 
-.feature-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
+                100% {
+                    transform: scale(1);
+                }
+            }
 
-.feature-description {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
+            .feature-title {
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #333;
+                margin-bottom: 1rem;
+            }
 
-.feature-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
+            .feature-description {
+                font-size: 1.2rem;
+                color: #555;
+                line-height: 1.6;
+                margin-bottom: 2rem;
+            }
 
-.feature-link:hover {
-    color: #5a002f;
-}
+            .feature-benefits {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
 
-.tracking-section {
-    margin-bottom: 3rem;
-    background-color: #f8f9fa;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-}
+            .benefit {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
 
-.tracking-container {
-    padding: 3rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+            .benefit-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: #73003b;
+                color: white;
+                font-size: 0.8rem;
+                font-weight: bold;
+            }
 
-.tracking-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
+            .benefit-text {
+                font-size: 1.1rem;
+                color: #333;
+                font-weight: 500;
+            }
 
-.tracking-description {
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    color: var(--text-muted);
-    font-size: 1.1rem;
-}
+            .feature-button {
+                display: inline-block;
+                background: #73003b;
+                color: white;
+                padding: 1rem 2.5rem;
+                border-radius: 50px;
+                font-size: 1.2rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 5px 15px rgba(115, 0, 59, 0.3);
+            }
 
-.tracking-form {
-    background: white;
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 500px;
-    margin-bottom: 2rem;
-}
+            .feature-button:hover {
+                background: #5a002f;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(115, 0, 59, 0.4);
+            }
 
-.status-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
+            .feature-card {
+                background: var(--card-bg);
+                border-radius: var(--border-radius);
+                padding: 2rem;
+                text-align: center;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: var(--card-shadow);
+            }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
 
-.form-group label {
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--text-color);
-}
+            .tracking-section {
+                margin-bottom: 3rem;
+                background-color: #f8f9fa;
+                border-radius: var(--border-radius);
+                overflow: hidden;
+            }
 
-.form-group input {
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
+            .tracking-container {
+                padding: 3rem 2rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
 
-.form-group input:focus {
-    border-color: var(--primary-color);
-    outline: none;
-}
+            .tracking-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
 
-.tracking-info {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-}
+            .tracking-description {
+                max-width: 600px;
+                margin: 0 auto 2rem;
+                color: var(--text-muted);
+                font-size: 1.1rem;
+            }
 
-.tracking-card {
-    display: flex;
-    align-items: center;
-    background: white;
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    width: 100%;
-    max-width: 300px;
-}
+            .tracking-form {
+                background: white;
+                padding: 2rem;
+                border-radius: var(--border-radius);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 500px;
+                margin-bottom: 2rem;
+            }
 
-.tracking-icon {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    margin-right: 1rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(var(--primary-rgb), 0.1);
-    border-radius: 50%;
-}
+            .status-form {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
 
-.tracking-text {
-    text-align: left;
-}
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                text-align: left;
+            }
 
-.tracking-text h3 {
-    margin: 0 0 0.5rem;
-    font-size: 1.1rem;
-    color: var(--text-color);
-}
+            .form-group label {
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: var(--text-color);
+            }
 
-.tracking-text p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
+            .form-group input {
+                padding: 0.75rem;
+                border: 1px solid #ddd;
+                border-radius: var(--border-radius);
+                font-size: 1rem;
+                transition: border-color 0.3s;
+            }
 
-.info-section {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 3rem 2rem;
-    margin-bottom: 3rem;
-    box-shadow: var(--card-shadow);
-}
+            .form-group input:focus {
+                border-color: var(--primary-color);
+                outline: none;
+            }
 
-.info-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
+            .tracking-info {
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+                flex-wrap: wrap;
+                margin-top: 1rem;
+            }
 
-.info-text {
-    color: var(--text-muted);
-    line-height: 1.8;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
+            .tracking-card {
+                display: flex;
+                align-items: center;
+                background: white;
+                padding: 1.5rem;
+                border-radius: var(--border-radius);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                width: 100%;
+                max-width: 300px;
+            }
 
-.info-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-}
+            .tracking-icon {
+                font-size: 1.5rem;
+                color: var(--primary-color);
+                margin-right: 1rem;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(var(--primary-rgb), 0.1);
+                border-radius: 50%;
+            }
 
-.stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-}
+            .tracking-text {
+                text-align: left;
+            }
 
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--primary-color);
-}
+            .tracking-text h3 {
+                margin: 0 0 0.5rem;
+                font-size: 1.1rem;
+                color: var(--text-color);
+            }
 
-.stat-label {
-    color: var(--text-muted);
-    font-size: 1rem;
-}
+            .tracking-text p {
+                margin: 0;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
 
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
-    
-    .hero-actions {
-        flex-direction: column;
-    }
-    
-    .hero-actions .btn {
-        width: 100%;
-    }
-    
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .info-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .tracking-container {
-        padding: 2rem 1rem;
-    }
-    
-    .tracking-info {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .tracking-card {
-        width: 100%;
-    }
-}
+            .info-section {
+                background: var(--card-bg);
+                border-radius: var(--border-radius);
+                padding: 3rem 2rem;
+                margin-bottom: 3rem;
+                box-shadow: var(--card-shadow);
+            }
 
-.alert {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    margin-bottom: 2rem;
-    border-radius: var(--border-radius);
-}
+            .info-content {
+                max-width: 800px;
+                margin: 0 auto;
+                text-align: center;
+            }
 
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
+            .info-text {
+                color: var(--text-muted);
+                line-height: 1.8;
+                margin-bottom: 2rem;
+                font-size: 1.1rem;
+            }
 
-.alert-icon {
-    margin-right: 1rem;
-    font-size: 1.25rem;
-}
+            .info-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 2rem;
+                margin-top: 3rem;
+            }
 
-.alert-content {
-    flex: 1;
-}
-</style> 
+            .stat-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+                font-weight: bold;
+                color: var(--primary-color);
+            }
+
+            .stat-label {
+                color: var(--text-muted);
+                font-size: 1rem;
+            }
+
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2.5rem;
+                }
+
+                .hero-subtitle {
+                    font-size: 1.1rem;
+                }
+
+                .hero-actions {
+                    flex-direction: column;
+                }
+
+                .hero-actions .btn {
+                    width: 100%;
+                }
+
+                .features-section {
+                    flex-direction: column;
+                }
+
+                .info-stats {
+                    grid-template-columns: 1fr;
+                }
+
+                .tracking-container {
+                    padding: 2rem 1rem;
+                }
+
+                .tracking-info {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .tracking-card {
+                    width: 100%;
+                }
+            }
+
+            .alert {
+                display: flex;
+                align-items: center;
+                padding: 1rem;
+                margin-bottom: 2rem;
+                border-radius: var(--border-radius);
+            }
+
+            .alert-danger {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+
+            .alert-icon {
+                margin-right: 1rem;
+                font-size: 1.25rem;
+            }
+
+            .alert-content {
+                flex: 1;
+            }
+        </style>

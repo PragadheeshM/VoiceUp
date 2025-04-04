@@ -1,0 +1,303 @@
+<%- contentFor('body') %>
+    <div class="complaints-container">
+        <h1 class="page-title">My Complaints</h1>
+
+        <div class="complaints-header">
+            <a href="/complaints" class="btn btn-primary">
+                <span class="btn-icon">+</span> File New Complaint
+            </a>
+        </div>
+
+        <% if (complaints && complaints.length> 0) { %>
+            <div class="complaints-list">
+                <% complaints.forEach(complaint=> { %>
+                    <div class="complaint-item">
+                        <div class="complaint-content">
+                            <div class="complaint-header">
+                                <h3 class="complaint-title">
+                                    <a href="/complaint/<%= complaint._id %>">
+                                        <%= complaint.title %>
+                                    </a>
+                                </h3>
+                                <div class="complaint-status-wrapper">
+                                    <div class="complaint-priority priority-<%= complaint.priority %>">
+                                        <% if (complaint.priority==='high' ) { %>
+                                            <span class="priority-icon">🔴</span>
+                                            <% } else if (complaint.priority==='medium' ) { %>
+                                                <span class="priority-icon">🟠</span>
+                                                <% } %>
+                                    </div>
+                                    <div class="complaint-status status-<%= complaint.status.toLowerCase() %>">
+                                        <%= complaint.status %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="complaint-meta">
+                                <span class="complaint-category">
+                                    <%= complaint.category.replace('_', ' ' ) %>
+                                </span>
+                                <span class="complaint-date">Filed on <%= new
+                                        Date(complaint.createdAt).toLocaleDateString() %></span>
+                            </div>
+                            <p class="complaint-description">
+                                <%= complaint.description.length> 150 ? complaint.description.substring(0, 150) + '...'
+                                    : complaint.description %>
+                            </p>
+                        </div>
+                        <div class="complaint-actions">
+                            <a href="/complaint/<%= complaint._id %>" class="btn btn-secondary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3 class="empty-title">No Complaints Filed</h3>
+                    <p class="empty-message">You haven't filed any complaints yet. Click the button above to file a new
+                        complaint.</p>
+                </div>
+                <% } %>
+    </div>
+
+    <%- contentFor('style') %>
+        <style>
+            .complaints-container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 2rem 1rem;
+            }
+
+            .page-title {
+                text-align: center;
+                margin-bottom: 2rem;
+                color: var(--text-color);
+                font-size: 2rem;
+            }
+
+            .complaints-header {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 2rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: var(--border-radius);
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.3s, transform 0.2s;
+                border: none;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn-icon {
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+
+            .btn-primary {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background-color: #5a002f;
+                transform: translateY(-2px);
+            }
+
+            .btn-secondary {
+                background-color: #f1f1f1;
+                color: var(--text-color);
+            }
+
+            .btn-secondary:hover {
+                background-color: #e0e0e0;
+            }
+
+            .btn-sm {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .complaints-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .complaint-item {
+                background-color: var(--card-bg);
+                border-radius: var(--border-radius);
+                box-shadow: var(--card-shadow);
+                padding: 1.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            .complaint-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+
+            .complaint-content {
+                flex: 1;
+            }
+
+            .complaint-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .complaint-title {
+                margin: 0;
+                font-size: 1.2rem;
+                color: var(--text-color);
+            }
+
+            .complaint-title a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            .complaint-title a:hover {
+                color: var(--primary-color);
+            }
+
+            .complaint-status {
+                padding: 0.25rem 0.75rem;
+                border-radius: 999px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .status-pending {
+                background-color: #fff8e1;
+                color: #ffa000;
+            }
+
+            .status-processing {
+                background-color: #e3f2fd;
+                color: #1976d2;
+            }
+
+            .status-resolved {
+                background-color: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .status-rejected {
+                background-color: #ffebee;
+                color: #c62828;
+            }
+
+            .complaint-meta {
+                display: flex;
+                gap: 1.5rem;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .complaint-category {
+                font-weight: 500;
+            }
+
+            .complaint-description {
+                color: var(--text-color);
+                line-height: 1.5;
+                margin: 0;
+            }
+
+            .complaint-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-left: 1rem;
+            }
+
+            .empty-state {
+                background-color: var(--card-bg);
+                border-radius: var(--border-radius);
+                box-shadow: var(--card-shadow);
+                padding: 3rem 2rem;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .empty-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+            .empty-title {
+                margin: 0 0 0.5rem;
+                color: var(--text-color);
+                font-size: 1.5rem;
+            }
+
+            .empty-message {
+                color: var(--text-muted);
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            @media (max-width: 768px) {
+                .complaint-item {
+                    flex-direction: column;
+                }
+
+                .complaint-actions {
+                    margin-left: 0;
+                    margin-top: 1rem;
+                    flex-direction: row;
+                    justify-content: flex-end;
+                }
+            }
+
+            .complaint-status-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .complaint-priority {
+                display: flex;
+                align-items: center;
+            }
+
+            .priority-icon {
+                font-size: 1.1rem;
+            }
+
+            .priority-high {
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.1);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+        </style>
