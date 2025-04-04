@@ -86,7 +86,7 @@
             </div>
             <% } %>
 
-                <% if (locals.user && locals.user.role==='ADMIN' || locals.user.role==='OFFICER' ) { %>
+                <% if (locals.user && (locals.user.role==='ADMIN' || locals.user.role==='OFFICER')) { %>
                     <div class="update-section">
                         <h2 class="section-title">Update Complaint Status</h2>
                         <form action="/update-complaint-status" method="POST" class="update-form">
@@ -258,36 +258,36 @@
             .comment-header {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 0.75rem;
-                flex-wrap: wrap;
-                gap: 0.5rem;
+                align-items: center;
+                margin-bottom: 1rem;
             }
 
             .comment-role {
-                padding: 0.25rem 0.75rem;
-                border-radius: 999px;
+                padding: 0.3rem 0.8rem;
+                border-radius: 0.25rem;
                 font-size: 0.8rem;
                 font-weight: 600;
+                text-transform: uppercase;
             }
 
             .admin-role {
-                background-color: #e8eaf6;
-                color: #3f51b5;
+                background-color: #b71c1c;
+                color: white;
             }
 
             .officer-role {
-                background-color: #e0f2f1;
-                color: #00796b;
+                background-color: #0d47a1;
+                color: white;
             }
 
             .citizen-role {
-                background-color: #f3e5f5;
-                color: #7b1fa2;
+                background-color: #2e7d32;
+                color: white;
             }
 
             .comment-date {
+                font-size: 0.85rem;
                 color: var(--text-muted);
-                font-size: 0.9rem;
             }
 
             .comment-content {
@@ -301,6 +301,7 @@
                 border-radius: var(--border-radius);
                 box-shadow: var(--card-shadow);
                 padding: 2rem;
+                margin-bottom: 2rem;
             }
 
             .update-form {
@@ -316,82 +317,56 @@
             }
 
             .form-label {
-                font-weight: 500;
                 color: var(--text-color);
+                font-weight: 500;
             }
 
             .form-input {
                 padding: 0.75rem;
                 border: 1px solid var(--border-color);
                 border-radius: var(--border-radius);
-                font-size: 1rem;
                 background-color: white;
-                transition: border-color 0.3s;
-            }
-
-            .form-input:focus {
-                border-color: var(--primary-color);
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(115, 0, 59, 0.1);
+                color: var(--text-color);
             }
 
             .form-textarea {
-                resize: vertical;
                 min-height: 100px;
-            }
-
-            .btn {
-                padding: 0.75rem 1.5rem;
-                border-radius: var(--border-radius);
-                font-size: 1rem;
-                font-weight: 500;
-                cursor: pointer;
-                transition: background-color 0.3s, transform 0.2s;
-                border: none;
-                text-decoration: none;
-                display: inline-block;
+                resize: vertical;
             }
 
             .btn-primary {
+                display: inline-block;
                 background-color: var(--primary-color);
                 color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: var(--border-radius);
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                text-align: center;
+                align-self: flex-start;
             }
 
             .btn-primary:hover {
-                background-color: #5a002f;
-                transform: translateY(-2px);
+                background-color: var(--primary-dark);
             }
 
             @media (max-width: 768px) {
-                .complaint-header {
-                    flex-direction: column;
-                }
-
                 .complaint-meta {
                     grid-template-columns: 1fr;
                 }
-            }
 
-            .priority-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-                font-weight: 600;
-            }
+                .btn-primary {
+                    align-self: stretch;
+                }
 
-            .priority-badge.low {
-                color: #2e7d32;
-            }
+                .complaint-title {
+                    font-size: 1.5rem;
+                }
 
-            .priority-badge.medium {
-                color: #f57c00;
-            }
-
-            .priority-badge.high {
-                color: #d32f2f;
-            }
-
-            .priority-dot {
-                font-size: 1.2rem;
+                .section-title {
+                    font-size: 1.2rem;
+                }
             }
         </style>

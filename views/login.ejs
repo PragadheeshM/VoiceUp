@@ -7,9 +7,9 @@
         </div>
         
         <% if (locals.error) { %>
-            <div class="alert alert-error">
+            <div class="alert alert-danger">
                 <div class="alert-icon">⚠️</div>
-                <div class="alert-message"><%= error %></div>
+                <div class="alert-content"><%= error %></div>
             </div>
         <% } %>
         
@@ -212,17 +212,24 @@
 .alert {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
     padding: 1rem;
-    border-radius: var(--border-radius);
     margin-bottom: 1.5rem;
+    border-radius: 5px;
+    gap: 0.75rem;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
 .alert-icon {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
 }
 
-.alert-message {
+.alert-content {
+    font-size: 0.9rem;
     flex: 1;
 }
 

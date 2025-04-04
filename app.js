@@ -288,13 +288,38 @@ app.post('/login', async (req, res) => {
 })
 
 function isLoggedIn(req, res, next) {
-  if (req.cookies.Token === "") {
-    res.send('<span>You must be logged in first .. <a href="/">Log In</a></span>');
+  if (!req.cookies.Token || req.cookies.Token === "") {
+    // For API responses
+    if (req.xhr || req.path.includes('/api/')) {
+      return res.status(401).json({ error: 'You must be logged in to access this resource' });
+    }
+    
+    // Check if the request is for complaints page specifically
+    if (req.path === '/complaints') {
+      return res.render('login', { 
+        title: 'Login', 
+        error: 'Please login first to register a complaint' 
+      });
+    }
+    
+    // Generic message for other protected routes
+    return res.render('login', { 
+      title: 'Login', 
+      error: 'You must be logged in to access this resource' 
+    });
   }
-  else {
-    let data = jwt.verify(req.cookies.Token, "shhh")
+  
+  try {
+    let data = jwt.verify(req.cookies.Token, "shhh");
     req.user = data;
     next();
+  } catch (error) {
+    // JWT verification failed
+    res.clearCookie('Token');
+    return res.render('login', { 
+      title: 'Login', 
+      error: 'Your session has expired. Please login again.' 
+    });
   }
 }
 
@@ -457,33 +482,50 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
     const officers = await usermodel.find({ role: 'OFFICER' });
     const citizens = await usermodel.find({ role: 'CITIZEN' });
 
-    // Sample complaints data (replace with actual data from your database)
-    const complaints = [
-      {
-        _id: '1',
-        title: 'Road Repair Request',
-        status: 'PENDING',
-        createdAt: new Date()
-      },
-      {
-        _id: '2',
-        title: 'Water Supply Issue',
-        status: 'PROCESSING',
-        createdAt: new Date(Date.now() - 86400000) // 1 day ago
-      },
-      {
-        _id: '3',
-        title: 'Garbage Collection',
-        status: 'RESOLVED',
-        createdAt: new Date(Date.now() - 172800000) // 2 days ago
-      },
-      {
-        _id: '4',
-        title: 'Street Light Repair',
-        status: 'REJECTED',
-        createdAt: new Date(Date.now() - 259200000) // 3 days ago
-      }
-    ];
+    // Get actual complaints data
+    let complaints = await Complaint.find().sort({ createdAt: -1 }).limit(5);
+    
+    // If no complaints exist yet, use sample data with all necessary fields
+    if (complaints.length === 0) {
+      complaints = [
+        {
+          _id: '1',
+          title: 'Road Repair Request',
+          status: 'PENDING',
+          createdAt: new Date(),
+          category: 'INFRASTRUCTURE',
+          priority: 'medium',
+          location: 'Main Street'
+        },
+        {
+          _id: '2',
+          title: 'Water Supply Issue',
+          status: 'PROCESSING',
+          createdAt: new Date(Date.now() - 86400000), // 1 day ago
+          category: 'WATER_SUPPLY',
+          priority: 'high',
+          location: 'North District'
+        },
+        {
+          _id: '3',
+          title: 'Garbage Collection',
+          status: 'RESOLVED',
+          createdAt: new Date(Date.now() - 172800000), // 2 days ago
+          category: 'SANITATION',
+          priority: 'low',
+          location: 'South District'
+        },
+        {
+          _id: '4',
+          title: 'Street Light Repair',
+          status: 'REJECTED',
+          createdAt: new Date(Date.now() - 259200000), // 3 days ago
+          category: 'ELECTRICITY',
+          priority: 'medium',
+          location: 'East District'
+        }
+      ];
+    }
 
     res.render('admin-dashboard', {
       title: 'Admin Dashboard',
@@ -539,12 +581,16 @@ app.post('/create-officer', isLoggedIn, isAdmin, async (req, res) => {
 });
 
 // Delete user route
-app.post('/delete-user', isLoggedIn, isAdmin, async (req, res) => {
+app.post('/delete-user/:userId', isLoggedIn, isAdmin, async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.params.userId;
 
     // Prevent deleting the last admin
     const userToDelete = await usermodel.findById(userId);
+    if (!userToDelete) {
+      return res.status(404).send('User not found');
+    }
+    
     if (userToDelete.role === 'ADMIN') {
       const adminCount = await usermodel.countDocuments({ role: 'ADMIN' });
       if (adminCount <= 1) {
@@ -620,5 +666,5 @@ app.post('/track-status', async (req, res) => {
     });
   }
 });
-
+ 
 app.listen(3000);
