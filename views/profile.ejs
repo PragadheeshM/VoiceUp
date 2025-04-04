@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/profile.css">
+</head>
+
+<body>
+    <div class="maincontainer w-full min-h-screen bg-zinc-900 text-white p-7 flex flex-col">
+        <div class="container">
+            <div class="logout flex justify-between items-center">
+                <span class="text-2xl">Welcome, <%=user.name%></span>
+                <a href="/logout"><button class="bg-red-600 p-1 rounded-md text-s mt-3 ml-3">Log Out</button></a>
+            </div>
+            <p class="mt-3 mb-3">Start Writing your thoughts...</p>
+            <div class="activity flex flex-col">
+                <form action="/post" method="post" class="form flex flex-col gap-3">
+                    <textarea name="content" rows="10" id=""
+                        class="resize-none  bg-zinc-600 border-2 border-zinc-200 text-white placeholder-white p-4 rounded-md"
+                        placeholder="What is in your head ...?"></textarea>
+                    <input type="submit" value="Create Post"
+                        class="create bg-blue-600 text-white text-l p-1 rounded-md cursor-pointer">
+                </form>
+        
+            </div>
+            
+            <!-- <%displaydata.forEach(function(data){%>
+                <div class="userdata bg-zinc-600 rounded-md h-72">
+                    <p class="pl-1 text-xl font-semibold"><%=data.username%></p>
+                    <p class="pl-1 text-blue-400 text-xs"><%=data.email%></p>
+            
+                </div>
+                <%})%> -->
+
+            <div class="posts">
+                <%user.posts.forEach(function(post){%>
+                    <div class="blogs bg-zinc-800 w-80 p-3 rounded-md mb-3">
+                        <header class="text-green-600">
+                            @<%=user.username%>
+                        </header>
+                        <p>
+                            <%=post.content%>
+                        </p>
+                        <span class="text-blue-600 cursor-pointer">Like</span>
+                    </div>
+                    <% })%>
+            </div>
+        </div>
+        <% blogg.forEach(function(pst){%>
+            <br>
+                <%=pst.content%>
+
+        <%})%>
+    </div>
+
+
+</body>
+
+</html>

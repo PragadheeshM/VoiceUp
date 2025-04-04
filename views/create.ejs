@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheet.css">
+</head>
+<body>
+    <div class="maincontainer w-full min-h-screen bg-zinc-900 flex justify-center items-center">
+      <div class="container shrink-0 flex justify-center items-center pb-3 z-10 rounded-3xl border-2 border-green-500">
+        <form class="form" action="/create" method="post">
+          <p class="text-green-500 font-bold text-2xl pt-2">Create Account</p>
+          <span class="input-span">
+              <span class="input-span">
+                  <label for="username" class="label">Username</label>
+                  <input type="username" name="username" id="username" required="" oninvalid="this.setCustomValidity('Please Enter valid username')" oninput="setCustomValidity('')"
+                /></span>
+                <span class="input-span">
+                  <label for="age" class="label">Age</label>
+                  <input type="number" name="age" id="age" required="" min="18" oninvalid="this.setCustomValidity('You Should be 18 or above to create an account')" oninput="setCustomValidity('')"
+                /></span>
+            <label for="email" class="label">Email</label>
+            <input type="email" name="email" id="email" class="email" required="" oninvalid="this.setCustomValidity('Please Enter valid email')" oninput="setCustomValidity('')"
+          /></span>
+          <span class="input-span">
+            <label for="password" class="label">Password</label>
+            <input type="password" name="password" id="password" required="" oninvalid="this.setCustomValidity('Please Enter valid passwoord')" oninput="setCustomValidity('')"
+          /></span>
+          <input class="submit" type="submit" value="Create Account" />
+          <span class="span">Already have an account? <a href="/">Log In</a></span>
+        </form>
+      </div>
+       
+          
+    </div>
+</body>
+</html>

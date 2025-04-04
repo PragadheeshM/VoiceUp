@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheet.css">
+</head>
+<body>
+    <div class="maincontainer w-full min-h-screen bg-zinc-900 flex justify-center items-center">
+      <div class="container flex justify-center items-center z-10 pb-5 rounded-3xl border-2 border-green-500">
+        <form class="form" action="/login" method="post">
+          <p class="text-3xl font-extrabold text-green-600 pb-2">Log In</p>
+          <span class="input-span">
+            <label for="email" class="label">Email</label>
+            <input type="email" name="email" id="email" required=""
+          /></span>
+          <span class="input-span">
+            <label for="password" class="label">Password</label>
+            <input type="password" name="password" id="password" required=""
+          /></span>
+          <span class="span"><a href="#">Forgot password?</a></span>
+          <input class="submit" type="submit" value="Log in" />
+          <span class="span">Don't have an account? <a href="/create">Sign up</a></span>
+        </form>
+      </div>
+          
+    </div>
+</body>
+</html>
