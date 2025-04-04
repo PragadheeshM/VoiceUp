@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Government Portal</title>
+    <link rel="stylesheet" href="/common.css">
+    <%- style %>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-content">
+            <a href="/" class="navbar-brand">Government Portal</a>
+            <nav class="navbar-links">
+                <a href="/">Home</a>
+                <a href="/services">Services</a>
+                <a href="/currentStatus">Current Status</a>
+                <% if (locals.user) { %>
+                    <% if (locals.user.role === 'ADMIN') { %>
+                        <a href="/admin">Admin Dashboard</a>
+                    <% } %>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/create">Sign Up</a>
+                <% } %>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <%- body %>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">&copy; 2025 Government Portal | All Rights Reserved</p>
+        </div>
+    </footer>
+</body>
+</html> 

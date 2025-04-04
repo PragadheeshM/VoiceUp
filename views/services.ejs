@@ -1,103 +1,174 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services - Government Grievance Portal</title>
-    <style>
-        :root {
-            --primary-color: #73003b;
-            --accent-color: #ffcc00;
-        }
-        * {
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--primary-color);
-            padding: 15px 30px;
-            color: white;
-        }
-        .navbar ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .navbar ul li a:hover {
-            text-decoration: underline;
-        }
-        .services {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
-        .service {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            font-weight: bold;
-        }
-        footer {
-            text-align: center;
-            padding: 15px;
-            background: var(--primary-color);
-            color: white;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="navbar">
-            <h1>Govt Grievance Portal</h1>
-            <nav>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/currentStatus">Current Status</a></li>
-                    <li><a href="/services">Services</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
+<%- contentFor('body') %>
+<div class="services-container">
+    <h1 class="services-title">Government Services</h1>
+    
+    <div class="services-grid">
+        <div class="service-card">
+            <h2 class="service-title">Document Verification</h2>
+            <p class="service-description">Submit and verify your government documents online</p>
+            <div class="service-actions">
+                <a href="/services/document-verification" class="btn btn-primary">Apply Now</a>
+                <a href="/services/document-verification/guide" class="btn btn-secondary">Learn More</a>
+            </div>
         </div>
-    </header>
 
-    <section class="services">
-        <h2>Our Services</h2>
-        <div class="grid">
-            <div class="service">Banking</div>
-            <div class="service">Transport</div>
-            <div class="service">Education</div>
-            <div class="service">Health</div>
+        <div class="service-card">
+            <h2 class="service-title">License Renewal</h2>
+            <p class="service-description">Renew your government-issued licenses and permits</p>
+            <div class="service-actions">
+                <a href="/services/license-renewal" class="btn btn-primary">Apply Now</a>
+                <a href="/services/license-renewal/guide" class="btn btn-secondary">Learn More</a>
+            </div>
         </div>
-    </section>
 
-    <footer>
-        <p>&copy; 2025 Government of India | All Rights Reserved</p>
-    </footer>
-</body>
-</html>
+        <div class="service-card">
+            <h2 class="service-title">Tax Services</h2>
+            <p class="service-description">File taxes and manage your tax-related services</p>
+            <div class="service-actions">
+                <a href="/services/tax-filing" class="btn btn-primary">Apply Now</a>
+                <a href="/services/tax-filing/guide" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+
+        <div class="service-card">
+            <h2 class="service-title">Social Services</h2>
+            <p class="service-description">Access social welfare programs and benefits</p>
+            <div class="service-actions">
+                <a href="/services/social-welfare" class="btn btn-primary">Apply Now</a>
+                <a href="/services/social-welfare/guide" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="service-info">
+        <h2 class="info-title">Need Help?</h2>
+        <p class="info-description">
+            Our support team is available to assist you with any questions or issues you may have.
+            Contact us through the following channels:
+        </p>
+        <div class="support-options">
+            <div class="support-option">
+                <h3 class="option-title">Email Support</h3>
+                <p class="option-detail">support@government-portal.gov</p>
+            </div>
+            <div class="support-option">
+                <h3 class="option-title">Phone Support</h3>
+                <p class="option-detail">1-800-GOV-SUPPORT</p>
+            </div>
+            <div class="support-option">
+                <h3 class="option-title">Live Chat</h3>
+                <p class="option-detail">Available 24/7</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('style') %>
+<style>
+.services-container {
+    padding: 2rem;
+}
+
+.services-title {
+    color: var(--text-color);
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.service-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.service-title {
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.service-description {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.service-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.service-info {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+}
+
+.info-title {
+    color: var(--text-color);
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.info-description {
+    color: var(--text-muted);
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+}
+
+.support-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.support-option {
+    padding: 1.5rem;
+    background: var(--input-bg);
+    border-radius: var(--border-radius);
+}
+
+.option-title {
+    color: var(--text-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.option-detail {
+    color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+    .services-title {
+        font-size: 2rem;
+    }
+
+    .service-actions {
+        flex-direction: column;
+    }
+
+    .support-options {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

@@ -1,0 +1,146 @@
+<%- contentFor('body') %>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Admin Dashboard</h1>
+        <div class="dashboard-actions">
+            <a href="/create-officer" class="btn btn-primary">Create Officer Account</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Officers Section -->
+        <div class="dashboard-card">
+            <h2 class="card-title">Officers</h2>
+            <div class="user-list">
+                <% officers.forEach(function(officer) { %>
+                    <div class="user-card">
+                        <div class="user-info">
+                            <p class="user-name"><%= officer.username %></p>
+                            <p class="user-detail"><%= officer.email %></p>
+                            <p class="user-detail">Age: <%= officer.age %></p>
+                        </div>
+                        <form action="/delete-user" method="POST" class="user-actions">
+                            <input type="hidden" name="userId" value="<%= officer._id %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <!-- Citizens Section -->
+        <div class="dashboard-card">
+            <h2 class="card-title">Citizens</h2>
+            <div class="user-list">
+                <% citizens.forEach(function(citizen) { %>
+                    <div class="user-card">
+                        <div class="user-info">
+                            <p class="user-name"><%= citizen.username %></p>
+                            <p class="user-detail"><%= citizen.email %></p>
+                            <p class="user-detail">Age: <%= citizen.age %></p>
+                        </div>
+                        <form action="/delete-user" method="POST" class="user-actions">
+                            <input type="hidden" name="userId" value="<%= citizen._id %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('style') %>
+<style>
+.dashboard-container {
+    padding: 2rem;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    color: var(--text-color);
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.dashboard-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.card-title {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.user-card {
+    background: var(--input-bg);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.user-detail {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.user-actions {
+    margin-left: 1rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--danger-hover-color);
+}
+</style> 
