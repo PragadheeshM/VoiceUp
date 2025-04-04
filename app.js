@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const path = require('path');
 const usermodel = require('./model/user');
-const postmodel =require("./model/post")
+const postmodel = require("./model/post")
 const cookieParser = require('cookie-parser');
 const { verify } = require('crypto');
 const mongoose = require('mongoose');
@@ -23,40 +23,40 @@ mongoose.connect('mongodb://127.0.0.1:27017/Data-Association', {
   maxPoolSize: 10,
   minPoolSize: 5
 })
-.then(() => {
-  console.log('Connected to MongoDB successfully');
-  
-  // Create default admin account if it doesn't exist
-  createDefaultAdmin();
-})
-.catch((err) => {
-  console.error('MongoDB connection error details:', {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    codeName: err.codeName
+  .then(() => {
+    console.log('Connected to MongoDB successfully');
+
+    // Create default admin account if it doesn't exist
+    createDefaultAdmin();
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error details:', {
+      name: err.name,
+      message: err.message,
+      code: err.code,
+      codeName: err.codeName
+    });
+    // Don't exit immediately, try to reconnect
+    console.log('Attempting to reconnect...');
+    setTimeout(() => {
+      mongoose.connect('mongodb://localhost:27017/Data-Association', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      }).catch(console.error);
+    }, 5000);
   });
-  // Don't exit immediately, try to reconnect
-  console.log('Attempting to reconnect...');
-  setTimeout(() => {
-    mongoose.connect('mongodb://localhost:27017/Data-Association', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    }).catch(console.error);
-  }, 5000);
-});
 
 // Function to create default admin account
 async function createDefaultAdmin() {
   try {
     // Check if admin already exists
     const adminExists = await usermodel.findOne({ role: 'ADMIN' });
-    
+
     if (!adminExists) {
       // Create default admin account
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash('admin123', salt);
-      
+
       await usermodel.create({
         username: 'admin',
         name: 'Administrator',
@@ -65,7 +65,7 @@ async function createDefaultAdmin() {
         password: hash,
         role: 'ADMIN'
       });
-      
+
       console.log('Default admin account created successfully');
       console.log('Email: admin@example.com');
       console.log('Password: admin123');
@@ -101,21 +101,23 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Add middleware to make user authentication state available to all pages
 app.use(async (req, res, next) => {
-    res.locals.user = null;
-    const token = req.cookies.token;
-    
-    if (token) {
-        try {
-            const decoded = jwt.verify(token, 'your-secret-key');
-            const user = await usermodel.findById(decoded.userId);
-            if (user) {
-                res.locals.user = user;
-            }
-        } catch (error) {
-            console.error('Token verification error:', error);
-        }
+  res.locals.user = null;
+  const token = req.cookies.Token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, "shhh");
+      const user = await usermodel.findById(decoded.userId);
+      if (user) {
+        res.locals.user = user;
+      }
+    } catch (error) {
+      console.error('Token verification error:', error);
+      // Clear invalid token
+      res.clearCookie('Token');
     }
-    next();
+  }
+  next();
 });
 
 app.get('/', (req, res) => {
@@ -127,25 +129,28 @@ app.get('/create', (req, res) => {
 }
 )
 
-app.get("/profile",isLoggedIn,async (req,res) => {
-  let displaydata=await usermodel.find()
-  let user=await usermodel.findOne({email:req.user.email}).populate("posts")
+app.get("/profile", isLoggedIn, async (req, res) => {
+  let displaydata = await usermodel.find()
+  let user = await usermodel.findOne({ email: req.user.email }).populate("posts")
   let blogg = await postmodel.find();
-  res.render('profile',{title: 'Profile', user,blogg,displaydata});
-}
-) 
-app.get('/logout', async (req, res) => {
-  res.cookie("Token", "");
-  res.redirect('/');
+  res.render('profile', { title: 'Profile', user, blogg, displaydata });
 }
 )
+app.get('/logout', async (req, res) => {
+  res.clearCookie('Token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  res.redirect('/');
+});
 
 
-app.post("/post",isLoggedIn,async(req,res) => {
-  let user=await usermodel.findOne({email:req.user.email});
-  let {content}=req.body;
-  let post=await postmodel.create({
-    userinfo:user._id,
+app.post("/post", isLoggedIn, async (req, res) => {
+  let user = await usermodel.findOne({ email: req.user.email });
+  let { content } = req.body;
+  let post = await postmodel.create({
+    userinfo: user._id,
     content
   })
 
@@ -166,7 +171,7 @@ app.post('/create', async (req, res) => {
       bcrypt.hash(password, salt, async (err, hash) => {
         // All users created through this form will be CITIZEN
         const userRole = 'CITIZEN';
-        
+
         const newuserdata = await usermodel.create({
           username,
           name: username,
@@ -183,34 +188,48 @@ app.post('/create', async (req, res) => {
   }
 })
 app.post('/login', async (req, res) => {
-  let { email, password } = req.body;
+  let { email, password, remember } = req.body;
   let user = await usermodel.findOne({ email });
   if (user) {
     let verify = bcrypt.compare(password, user.password, (err, result) => {
       if (result) {
-        let token = jwt.sign({ email: email, role: user.role }, "shhh");
-        res.cookie("Token", token);
-        res.redirect('/profile')
+        // Set token expiration based on "Remember Me" checkbox
+        const expiresIn = remember ? '30d' : '1d';
+        let token = jwt.sign({
+          email: email,
+          role: user.role,
+          userId: user._id
+        }, "shhh", { expiresIn });
+
+        // Set cookie with secure options
+        res.cookie("Token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+          sameSite: 'strict',
+          maxAge: remember ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 // 30 days or 1 day
+        });
+
+        res.redirect('/profile');
       }
       else {
-        res.send("Incorrect Credintials. Verify your email and password")
+        res.send("Incorrect Credentials. Verify your email and password");
       }
     });
   }
   else {
-    res.send('<span>No such User Exists Create one ? .. <a href="/">Create</a></span>')
+    res.send('<span>No such User Exists Create one ? .. <a href="/">Create</a></span>');
   }
 })
 
-function isLoggedIn(req,res,next){
-  if(req.cookies.Token===""){
-    res.send('<span>You must be logged in first .. <a href="/">Log In</a></span>'); 
+function isLoggedIn(req, res, next) {
+  if (req.cookies.Token === "") {
+    res.send('<span>You must be logged in first .. <a href="/">Log In</a></span>');
   }
-  else{
-    let data=jwt.verify(req.cookies.Token, "shhh")
-    req.user=data;
+  else {
+    let data = jwt.verify(req.cookies.Token, "shhh")
+    req.user = data;
     next();
-  } 
+  }
 }
 
 // Role-based middleware functions
