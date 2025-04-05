@@ -483,7 +483,7 @@ function generateTrackingId() {
 
 app.post('/complaints', isLoggedIn, async (req, res) => {
   try {
-    const { title, description, location } = req.body;
+    const { title, description, state, city, specific_location } = req.body;
 
     // Make sure we have a valid user ID
     if (!req.user.userId) {
@@ -502,6 +502,18 @@ app.post('/complaints', isLoggedIn, async (req, res) => {
         categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER']
       });
     }
+
+    // Validate location fields
+    if (!state || !city || !specific_location) {
+      return res.render('file-complaint', {
+        title: 'File a Complaint',
+        error: 'State, city, and specific location are required',
+        categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER']
+      });
+    }
+
+    // Format location string
+    const location = `${specific_location}, ${city}, ${state}, India`;
 
     // Use AI to categorize the complaint
     const category = await categorizeComplaint(description);
