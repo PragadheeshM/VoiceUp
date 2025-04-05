@@ -22,8 +22,8 @@
                         <% complaints.forEach(complaint=> { %>
                             <div class="complaint-card">
                                 <div class="complaint-header">
-                                    <div class="department-badge">
-                                        <%= complaint.department %>
+                                    <div class="category-badge">
+                                        <%= complaint.category.replace('_', ' ') %>
                                     </div>
                                     <div class="status-badge <%= complaint.status.toLowerCase() %>">
                                         <%= complaint.status %>
@@ -111,7 +111,7 @@
                 align-items: center;
             }
 
-            .department-badge {
+            .category-badge {
                 background: #e3f2fd;
                 color: #1976d2;
                 padding: 0.25rem 0.75rem;

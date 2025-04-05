@@ -7,7 +7,7 @@ const path = require('path');
 const usermodel = require('./model/user');
 const postmodel = require("./model/post")
 const { Municipality, Police, Electricity, RTO } = require('./model/departments');
-const { categorizeComplaint } = require('./utils/categorizer');
+const { categorizeComplaint, getGovernmentSchemeInfo } = require('./utils/categorizer');
 const cookieParser = require('cookie-parser');
 const { verify } = require('crypto');
 const mongoose = require('mongoose');
@@ -374,10 +374,30 @@ function isLoggedIn(req, res, next) {
 
   try {
     let data = jwt.verify(req.cookies.Token, "shhh");
-    req.user = data;
+    console.log('JWT token verified, user data:', data);
+    
+    // Make sure the user object has all required fields
+    if (!data.userId) {
+      console.error('JWT token missing userId:', data);
+      res.clearCookie('Token');
+      return res.render('login', {
+        title: 'Login',
+        error: 'Your session is invalid. Please login again.'
+      });
+    }
+    
+    // Set the user data in the request object
+    req.user = {
+      userId: data.userId,
+      email: data.email,
+      role: data.role,
+      username: data.username
+    };
+    
     next();
   } catch (error) {
     // JWT verification failed
+    console.error('JWT verification error:', error);
     res.clearCookie('Token');
     return res.render('login', {
       title: 'Login',
@@ -436,110 +456,72 @@ app.get('/complaints', isLoggedIn, (req, res) => {
   });
 });
 
-app.post('/complaints', async (req, res) => {
+app.post('/complaints', isLoggedIn, async (req, res) => {
   try {
     const { title, description, location } = req.body;
-    const userId = req.user ? req.user._id : null;
+    
+    // Make sure we have a valid user ID
+    if (!req.user.userId) {
+      console.error('User object missing userId:', req.user);
+      return res.render('file-complaint', {
+        title: 'File a Complaint',
+        error: 'Authentication error. Please try logging in again.',
+        categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER']
+      });
+    }
 
     if (!description) {
       return res.render('file-complaint', {
         title: 'File a Complaint',
         error: 'Description is required for AI categorization',
-        categories: ['MUNICIPALITY', 'POLICE', 'ELECTRICITY', 'RTO']
+        categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER']
       });
     }
 
     // Use AI to categorize the complaint
     const category = await categorizeComplaint(description);
+    
+    // Get relevant government scheme information
+    const schemeInfo = await getGovernmentSchemeInfo(category, description);
 
-    // Create complaint based on category
-    let complaint;
-    switch (category) {
-      case 'MUNICIPALITY':
-        complaint = new Municipality({
-          title,
-          description,
-          location,
-          userId,
-          status: 'PENDING',
-          priority: 'MEDIUM'
-        });
-        break;
-      case 'POLICE':
-        complaint = new Police({
-          title,
-          description,
-          location,
-          userId,
-          status: 'PENDING',
-          priority: 'MEDIUM'
-        });
-        break;
-      case 'ELECTRICITY':
-        complaint = new Electricity({
-          title,
-          description,
-          location,
-          userId,
-          status: 'PENDING',
-          priority: 'MEDIUM'
-        });
-        break;
-      case 'RTO':
-        complaint = new RTO({
-          title,
-          description,
-          location,
-          userId,
-          status: 'PENDING',
-          priority: 'MEDIUM'
-        });
-        break;
-      default:
-        throw new Error('Invalid category');
-    }
+    // Create complaint using the main Complaint model
+    const complaint = new Complaint({
+      title,
+      description,
+      location,
+      userId: req.user.userId,
+      category,
+      status: 'PENDING',
+      priority: 'medium'
+    });
 
     await complaint.save();
 
-    // Redirect with success message
+    // Redirect with success message and scheme information
     res.render('file-complaint', {
       title: 'File a Complaint',
-      success: 'Complaint submitted successfully and categorized by AI'
+      success: 'Complaint submitted successfully and categorized by AI',
+      categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER'],
+      schemeInfo: schemeInfo
     });
   } catch (error) {
     console.error('Error submitting complaint:', error);
     res.render('file-complaint', {
       title: 'File a Complaint',
       error: 'Failed to submit complaint. Please try again. Error: ' + error.message,
-      categories: ['MUNICIPALITY', 'POLICE', 'ELECTRICITY', 'RTO']
+      categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER']
     });
   }
 });
 
 app.get('/my-complaints', isLoggedIn, async (req, res) => {
   try {
-    // Fetch complaints from all departments
-    const [municipalityComplaints, policeComplaints, electricityComplaints, rtoComplaints] = await Promise.all([
-      Municipality.find({ userId: req.user._id }).sort({ createdAt: -1 }),
-      Police.find({ userId: req.user._id }).sort({ createdAt: -1 }),
-      Electricity.find({ userId: req.user._id }).sort({ createdAt: -1 }),
-      RTO.find({ userId: req.user._id }).sort({ createdAt: -1 })
-    ]);
-
-    // Combine all complaints and add department type
-    const allComplaints = [
-      ...municipalityComplaints.map(c => ({ ...c.toObject(), department: 'Municipality' })),
-      ...policeComplaints.map(c => ({ ...c.toObject(), department: 'Police' })),
-      ...electricityComplaints.map(c => ({ ...c.toObject(), department: 'Electricity' })),
-      ...rtoComplaints.map(c => ({ ...c.toObject(), department: 'RTO' }))
-    ];
-
-    // Sort all complaints by creation date
-    allComplaints.sort((a, b) => b.createdAt - a.createdAt);
+    // Fetch complaints for the current user using the correct user ID field
+    const complaints = await Complaint.find({ userId: req.user.userId }).sort({ createdAt: -1 });
 
     res.render('my-complaints', {
       title: 'My Complaints',
-      complaints: allComplaints
+      complaints
     });
   } catch (error) {
     console.error('Error fetching complaints:', error);
@@ -574,28 +556,12 @@ app.get('/complaint/:id', isLoggedIn, async (req, res) => {
 // Admin dashboard for complaints
 app.get('/admin-complaints', isLoggedIn, isOfficer, async (req, res) => {
   try {
-    // Fetch complaints from all departments
-    const [municipalityComplaints, policeComplaints, electricityComplaints, rtoComplaints] = await Promise.all([
-      Municipality.find().sort({ createdAt: -1 }),
-      Police.find().sort({ createdAt: -1 }),
-      Electricity.find().sort({ createdAt: -1 }),
-      RTO.find().sort({ createdAt: -1 })
-    ]);
-
-    // Combine all complaints and add department type
-    const allComplaints = [
-      ...municipalityComplaints.map(c => ({ ...c.toObject(), department: 'Municipality' })),
-      ...policeComplaints.map(c => ({ ...c.toObject(), department: 'Police' })),
-      ...electricityComplaints.map(c => ({ ...c.toObject(), department: 'Electricity' })),
-      ...rtoComplaints.map(c => ({ ...c.toObject(), department: 'RTO' }))
-    ];
-
-    // Sort all complaints by creation date
-    allComplaints.sort((a, b) => b.createdAt - a.createdAt);
+    // Fetch all complaints using the main Complaint model
+    const complaints = await Complaint.find().sort({ createdAt: -1 });
 
     res.render('admin-complaints', {
       title: 'Manage Complaints',
-      complaints: allComplaints
+      complaints
     });
   } catch (error) {
     console.error('Error fetching complaints for admin:', error);
@@ -642,30 +608,14 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
     const officers = await usermodel.find({ role: 'OFFICER' });
     const citizens = await usermodel.find({ role: 'CITIZEN' });
 
-    // Fetch complaints from all departments
-    const [municipalityComplaints, policeComplaints, electricityComplaints, rtoComplaints] = await Promise.all([
-      Municipality.find().sort({ createdAt: -1 }),
-      Police.find().sort({ createdAt: -1 }),
-      Electricity.find().sort({ createdAt: -1 }),
-      RTO.find().sort({ createdAt: -1 })
-    ]);
-
-    // Combine all complaints and add department type
-    const allComplaints = [
-      ...municipalityComplaints.map(c => ({ ...c.toObject(), department: 'Municipality' })),
-      ...policeComplaints.map(c => ({ ...c.toObject(), department: 'Police' })),
-      ...electricityComplaints.map(c => ({ ...c.toObject(), department: 'Electricity' })),
-      ...rtoComplaints.map(c => ({ ...c.toObject(), department: 'RTO' }))
-    ];
-
-    // Sort all complaints by creation date
-    allComplaints.sort((a, b) => b.createdAt - a.createdAt);
+    // Fetch all complaints using the main Complaint model
+    const complaints = await Complaint.find().sort({ createdAt: -1 });
 
     res.render('admin-dashboard', {
       title: 'Admin Dashboard',
       officers,
       citizens,
-      complaints: allComplaints
+      complaints
     });
   } catch (error) {
     console.error('Error fetching admin dashboard data:', error);
@@ -824,8 +774,30 @@ app.post('/api/chat', async (req, res) => {
       }
     });
 
-    // Generate response
-    const result = await model.generateContent(message);
+    // Create a system prompt for the government grievance assistant
+    const systemPrompt = `You are a government grievance assistant chatbot designed to help Indian citizens understand and use the government grievance redressal system. You specialize in helping users:
+
+1. Identify the correct department for their complaint.
+2. Understand the grievance filing process on official platforms like CPGRAMS (Centralized Public Grievance Redress And Monitoring System).
+3. Find relevant government schemes that may assist them.
+4. Answer questions related to ministry responsibilities, complaint tracking, timelines, and escalation procedures.
+
+When helping users:
+- Be polite, professional, and empathetic
+- Provide accurate information about government departments and schemes
+- Explain processes in simple, step-by-step terms
+- Suggest relevant government schemes when appropriate
+- Guide users on how to track their complaints
+- Explain escalation procedures when needed
+
+If a user is asking about filing a complaint, guide them to use the complaint filing system on this portal.`;
+
+    // Generate response with the system prompt
+    const result = await model.generateContent([
+      { role: "system", content: systemPrompt },
+      { role: "user", content: message }
+    ]);
+    
     const response = await result.response;
     const text = response.text();
 
@@ -834,6 +806,31 @@ app.post('/api/chat', async (req, res) => {
     console.error('Error in chat API:', error);
     res.status(500).json({
       error: 'An error occurred while processing your request',
+      details: error.message
+    });
+  }
+});
+
+// Route to get government scheme information by category
+app.get('/api/schemes/:category', async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { description } = req.query;
+    
+    // Validate category
+    const validCategories = ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+    
+    // Get scheme information
+    const schemeInfo = await getGovernmentSchemeInfo(category, description || '');
+    
+    res.json(schemeInfo);
+  } catch (error) {
+    console.error('Error getting scheme information:', error);
+    res.status(500).json({
+      error: 'An error occurred while fetching scheme information',
       details: error.message
     });
   }

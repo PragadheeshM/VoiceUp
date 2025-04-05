@@ -24,7 +24,29 @@
                             <%= success %>
                         </div>
                     </div>
+                    
+                    <% if (locals.schemeInfo && locals.schemeInfo.schemes && locals.schemeInfo.schemes.length > 0) { %>
+                        <div class="scheme-info-section">
+                            <h3 class="scheme-title">Relevant Government Schemes</h3>
+                            <p class="scheme-description">Based on your complaint, here are some government schemes that might help:</p>
+                            
+                            <% schemeInfo.schemes.forEach(scheme => { %>
+                                <div class="scheme-card">
+                                    <h4 class="scheme-name"><%= scheme.name %></h4>
+                                    <p class="scheme-desc"><%= scheme.description %></p>
+                                    <p class="scheme-relevance"><strong>How it helps:</strong> <%= scheme.relevance %></p>
+                                    <% if (scheme.link) { %>
+                                        <a href="<%= scheme.link %>" target="_blank" class="scheme-link">Learn more about this scheme</a>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                            
+                            <div class="scheme-actions">
+                                <a href="/my-complaints" class="btn btn-primary">View My Complaints</a>
+                            </div>
+                        </div>
                     <% } %>
+                <% } %>
 
                         <div class="complaint-card">
                             <div class="complaint-card-header">
@@ -50,12 +72,16 @@
                                 <div class="form-group">
                                     <label for="description" class="form-label">Description</label>
                                     <textarea id="description" name="description" class="form-input form-textarea"
-                                        placeholder="Provide detailed information about your complaint. Our AI will analyze your description and automatically route it to the appropriate department:
+                                        placeholder="Provide detailed information about your complaint. Our AI will analyze your description and automatically categorize it:
                         
-- Municipality: For issues related to roads, garbage, water supply, drainage, public spaces
-- Police: For issues related to law enforcement, public safety, traffic violations
+- Infrastructure: For issues related to roads, bridges, buildings, and general city infrastructure
+- Water Supply: For issues related to water supply, quality, and distribution
 - Electricity: For issues related to power supply, street lights, electrical infrastructure
-- RTO: For issues related to vehicle registration, driving licenses, traffic management" rows="5" required></textarea>
+- Sanitation: For issues related to garbage collection, waste management, and cleanliness
+- Healthcare: For issues related to hospitals, clinics, medical services, and public health
+- Education: For issues related to schools, colleges, educational facilities, and learning resources
+- Transportation: For issues related to public transport, traffic management, and vehicle-related services
+- Other: For any issues that don't fit into the above categories" rows="5" required></textarea>
                                 </div>
 
                                 <div class="form-actions">
@@ -89,14 +115,14 @@
                                     <div class="step-number">3</div>
                                     <div class="step-content">
                                         <h4>Categorize</h4>
-                                        <p>AI determines the appropriate department</p>
+                                        <p>AI determines the appropriate category</p>
                                     </div>
                                 </div>
                                 <div class="step">
                                     <div class="step-number">4</div>
                                     <div class="step-content">
-                                        <h4>Route</h4>
-                                        <p>Complaint is sent to the right department</p>
+                                        <h4>Process</h4>
+                                        <p>Complaint is processed by the system</p>
                                     </div>
                                 </div>
                             </div>
@@ -364,7 +390,70 @@
             }
 
             .alert-content {
-                flex-grow: 1;
+                flex: 1;
+            }
+
+            .scheme-info-section {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+                border: 1px solid #e9ecef;
+            }
+
+            .scheme-title {
+                color: #2c3e50;
+                margin-bottom: 10px;
+            }
+
+            .scheme-description {
+                color: #6c757d;
+                margin-bottom: 20px;
+            }
+
+            .scheme-card {
+                background: white;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                border-left: 4px solid #007bff;
+            }
+
+            .scheme-name {
+                color: #007bff;
+                margin: 0 0 10px 0;
+            }
+
+            .scheme-desc {
+                color: #495057;
+                margin-bottom: 10px;
+            }
+
+            .scheme-relevance {
+                color: #6c757d;
+                font-size: 0.9rem;
+                margin-bottom: 10px;
+            }
+
+            .scheme-link {
+                display: inline-block;
+                color: #007bff;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .scheme-link:hover {
+                text-decoration: underline;
+            }
+
+            .scheme-actions {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .chat-widget {
+                /* Add any necessary styles for the chat widget */
             }
 
             @media (max-width: 768px) {

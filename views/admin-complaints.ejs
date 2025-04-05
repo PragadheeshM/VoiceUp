@@ -9,17 +9,22 @@
                 </div>
                 <div class="filter-box">
                     <select id="departmentFilter">
-                        <option value="">All Departments</option>
-                        <option value="Municipality">Municipality</option>
-                        <option value="Police">Police</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="RTO">RTO</option>
+                        <option value="">All Categories</option>
+                        <option value="INFRASTRUCTURE">Infrastructure</option>
+                        <option value="WATER_SUPPLY">Water Supply</option>
+                        <option value="ELECTRICITY">Electricity</option>
+                        <option value="SANITATION">Sanitation</option>
+                        <option value="HEALTHCARE">Healthcare</option>
+                        <option value="EDUCATION">Education</option>
+                        <option value="TRANSPORTATION">Transportation</option>
+                        <option value="OTHER">Other</option>
                     </select>
                     <select id="statusFilter">
                         <option value="">All Status</option>
                         <option value="PENDING">Pending</option>
-                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="PROCESSING">Processing</option>
                         <option value="RESOLVED">Resolved</option>
+                        <option value="REJECTED">Rejected</option>
                     </select>
                 </div>
             </div>
@@ -37,11 +42,11 @@
                 <% if (complaints && complaints.length> 0) { %>
                     <div class="complaints-grid">
                         <% complaints.forEach(complaint=> { %>
-                            <div class="complaint-card" data-department="<%= complaint.department %>"
+                            <div class="complaint-card" data-category="<%= complaint.category %>"
                                 data-status="<%= complaint.status %>">
                                 <div class="complaint-header">
-                                    <div class="department-badge">
-                                        <%= complaint.department %>
+                                    <div class="category-badge">
+                                        <%= complaint.category.replace('_', ' ') %>
                                     </div>
                                     <div class="status-badge <%= complaint.status.toLowerCase() %>">
                                         <%= complaint.status %>
@@ -74,10 +79,12 @@
                                         <select name="status" class="status-select">
                                             <option value="PENDING" <%=complaint.status==='PENDING' ? 'selected' : '' %>
                                                 >Pending</option>
-                                            <option value="IN_PROGRESS" <%=complaint.status==='IN_PROGRESS' ? 'selected'
-                                                : '' %>>In Progress</option>
+                                            <option value="PROCESSING" <%=complaint.status==='PROCESSING' ? 'selected'
+                                                : '' %>>Processing</option>
                                             <option value="RESOLVED" <%=complaint.status==='RESOLVED' ? 'selected' : ''
                                                 %>>Resolved</option>
+                                            <option value="REJECTED" <%=complaint.status==='REJECTED' ? 'selected' : ''
+                                                %>>Rejected</option>
                                         </select>
                                         <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
                                     </form>
@@ -180,7 +187,7 @@
                 align-items: center;
             }
 
-            .department-badge {
+            .category-badge {
                 background: #e3f2fd;
                 color: #1976d2;
                 padding: 0.25rem 0.75rem;
@@ -201,7 +208,7 @@
                 color: #f57c00;
             }
 
-            .status-badge.in-progress {
+            .status-badge.processing {
                 background: #e3f2fd;
                 color: #1976d2;
             }
@@ -209,6 +216,11 @@
             .status-badge.resolved {
                 background: #e8f5e9;
                 color: #388e3c;
+            }
+
+            .status-badge.rejected {
+                background: #ffebee;
+                color: #d32f2f;
             }
 
             .complaint-title {
@@ -406,13 +418,13 @@
                     const cards = document.querySelectorAll('.complaint-card');
 
                     cards.forEach(card => {
-                        const department = card.dataset.department;
+                        const category = card.dataset.category;
                         const status = card.dataset.status;
 
-                        const departmentMatch = !departmentFilter || department === departmentFilter;
+                        const categoryMatch = !departmentFilter || category === departmentFilter;
                         const statusMatch = !statusFilter || status === statusFilter;
 
-                        if (departmentMatch && statusMatch) {
+                        if (categoryMatch && statusMatch) {
                             card.style.display = '';
                         } else {
                             card.style.display = 'none';

@@ -2,32 +2,47 @@
     <div class="admin-dashboard-container">
         <div class="dashboard-header">
             <h1 class="page-title">Admin Dashboard</h1>
+            <div class="dashboard-actions">
+                <a href="/create-officer" class="btn btn-primary">
+                    <span class="btn-icon">👮</span>
+                    Add Officer
+                </a>
+            </div>
             <div class="dashboard-stats">
                 <div class="stat-card">
-                    <div class="stat-icon">👮</div>
-                    <div class="stat-info">
-                        <div class="stat-value">
-                            <%= officers.length %>
+                    <div class="stat-content">
+                        <div class="stat-icon">👮</div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= officers.length %></div>
+                            <div class="stat-label">Officers</div>
                         </div>
-                        <div class="stat-label">Officers</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: <%= (officers.length / (officers.length + citizens.length)) * 100 %>%"></div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-info">
-                        <div class="stat-value">
-                            <%= citizens.length %>
+                    <div class="stat-content">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= citizens.length %></div>
+                            <div class="stat-label">Citizens</div>
                         </div>
-                        <div class="stat-label">Citizens</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: <%= (citizens.length / (officers.length + citizens.length)) * 100 %>%"></div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📝</div>
-                    <div class="stat-info">
-                        <div class="stat-value">
-                            <%= complaints.length %>
+                    <div class="stat-content">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <div class="stat-value"><%= complaints.length %></div>
+                            <div class="stat-label">Total Complaints</div>
                         </div>
-                        <div class="stat-label">Total Complaints</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-bar" style="width: <%= Math.min((complaints.length / (officers.length + citizens.length)) * 100, 100) %>%"></div>
                     </div>
                 </div>
             </div>
@@ -51,11 +66,11 @@
                     <% if (complaints && complaints.length> 0) { %>
                         <div class="complaints-grid">
                             <% complaints.forEach(complaint=> { %>
-                                <div class="complaint-card" data-department="<%= complaint.department %>"
+                                <div class="complaint-card" data-category="<%= complaint.category %>"
                                     data-status="<%= complaint.status %>">
                                     <div class="complaint-header">
-                                        <div class="department-badge">
-                                            <%= complaint.department %>
+                                        <div class="category-badge">
+                                            <%= complaint.category.replace('_', ' ') %>
                                         </div>
                                         <div class="status-badge <%= complaint.status.toLowerCase() %>">
                                             <%= complaint.status %>
@@ -86,17 +101,13 @@
                                         <form action="/update-complaint-status" method="POST" class="status-form">
                                             <input type="hidden" name="complaintId" value="<%= complaint._id %>">
                                             <select name="status" class="status-select">
-                                                <option value="PENDING" <%=complaint.status==='PENDING' ? 'selected'
-                                                    : '' %>>Pending</option>
-                                                <option value="IN_PROGRESS" <%=complaint.status==='IN_PROGRESS'
-                                                    ? 'selected' : '' %>>In Progress</option>
-                                                <option value="RESOLVED" <%=complaint.status==='RESOLVED' ? 'selected'
-                                                    : '' %>>Resolved</option>
+                                                <option value="PENDING" <%= complaint.status === 'PENDING' ? 'selected' : '' %>>Pending</option>
+                                                <option value="IN_PROGRESS" <%= complaint.status === 'IN_PROGRESS' ? 'selected' : '' %>>In Progress</option>
+                                                <option value="RESOLVED" <%= complaint.status === 'RESOLVED' ? 'selected' : '' %>>Resolved</option>
                                             </select>
                                             <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
                                         </form>
-                                        <a href="/complaint/<%= complaint._id %>" class="btn btn-secondary btn-sm">View
-                                            Details</a>
+                                        <a href="/complaint/<%= complaint._id %>" class="btn btn-secondary btn-sm">View Details</a>
                                     </div>
                                 </div>
                                 <% }); %>
@@ -130,24 +141,46 @@
             }
 
             .dashboard-stats {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 1rem;
+                display: flex;
+                gap: 1.5rem;
                 margin-bottom: 2rem;
+                padding: 0.5rem;
             }
 
             .stat-card {
+                flex: 1;
                 background: white;
-                border-radius: 8px;
+                border-radius: 16px;
                 padding: 1.5rem;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .stat-content {
                 display: flex;
                 align-items: center;
-                gap: 1rem;
+                gap: 1.5rem;
             }
 
             .stat-icon {
-                font-size: 2rem;
+                font-size: 2.5rem;
+                background: #f8f9fa;
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                color: #73003b;
             }
 
             .stat-info {
@@ -155,14 +188,31 @@
             }
 
             .stat-value {
-                font-size: 1.5rem;
-                font-weight: 600;
+                font-size: 2rem;
+                font-weight: 700;
                 color: #2c3e50;
+                line-height: 1.2;
             }
 
             .stat-label {
                 color: #666;
                 font-size: 0.9rem;
+                font-weight: 500;
+                margin-top: 0.25rem;
+            }
+
+            .stat-progress {
+                height: 4px;
+                background: #f1f3f5;
+                border-radius: 2px;
+                overflow: hidden;
+            }
+
+            .progress-bar {
+                height: 100%;
+                background: #73003b;
+                border-radius: 2px;
+                transition: width 0.3s ease;
             }
 
             .dashboard-section {
@@ -207,7 +257,7 @@
                 align-items: center;
             }
 
-            .department-badge {
+            .category-badge {
                 background: #e3f2fd;
                 color: #1976d2;
                 padding: 0.25rem 0.75rem;
@@ -376,26 +426,99 @@
 
             @media (max-width: 768px) {
                 .dashboard-stats {
-                    grid-template-columns: 1fr;
-                }
-
-                .section-header {
                     flex-direction: column;
-                    gap: 1rem;
-                    align-items: flex-start;
                 }
 
-                .complaints-grid {
-                    grid-template-columns: 1fr;
+                .stat-card {
+                    width: 100%;
                 }
+            }
 
-                .status-form {
-                    flex-direction: column;
+            .dashboard-actions {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .dashboard-actions .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+                font-weight: 500;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+            .dashboard-actions .btn-primary {
+                background-color: #73003b;
+                color: white;
+                border: none;
+            }
+
+            .dashboard-actions .btn-primary:hover {
+                background-color: #5a002f;
+                transform: translateY(-2px);
+            }
+
+            .btn-icon {
+                font-size: 1.2rem;
+            }
+
+            .alert {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                animation: slideIn 0.3s ease-out;
+            }
+
+            .alert-success {
+                background-color: #e8f5e9;
+                color: #2e7d32;
+                border: 1px solid #a5d6a7;
+            }
+
+            .alert-danger {
+                background-color: #ffebee;
+                color: #c62828;
+                border: 1px solid #ef9a9a;
+            }
+
+            .alert-icon {
+                font-size: 1.25rem;
+            }
+
+            .alert-content {
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateY(-10px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
                 }
             }
         </style>
 
         <%- contentFor('script') %>
             <script>
-                // Add any necessary JavaScript for the dashboard
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Handle status update form submissions
+                    const statusForms = document.querySelectorAll('.status-form');
+                    statusForms.forEach(form => {
+                        form.addEventListener('submit', function(e) {
+                            // Let the form submit normally
+                            // The server will handle the redirect
+                        });
+                    });
+                });
             </script>

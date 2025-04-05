@@ -3,16 +3,30 @@
         <!-- Chat Bot Widget -->
         <div class="chat-widget">
             <div class="chat-widget-header">
-                <h3>AI Assistant</h3>
+                <h3>Government Grievance Assistant</h3>
                 <button class="close-chat">×</button>
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
-                    <p>Hello! I'm your AI assistant powered by Gemini Flash. How can I help you today?</p>
+                    <p>Hello! I'm your Government Grievance Assistant. I can help you with:</p>
+                    <ul class="suggestion-list">
+                        <li>Filing complaints</li>
+                        <li>Finding the right department</li>
+                        <li>Understanding government schemes</li>
+                        <li>Tracking your grievances</li>
+                    </ul>
+                    <p>How can I assist you today?</p>
+                    <div class="suggested-questions">
+                        <button class="suggestion-btn" data-question="How do I file a complaint?">How do I file a complaint?</button>
+                        <button class="suggestion-btn" data-question="Which department should I contact for road repairs?">Which department for road repairs?</button>
+                        <button class="suggestion-btn" data-question="What is PM Awas Yojana?">What is PM Awas Yojana?</button>
+                        <button class="suggestion-btn" data-question="How can I track my complaint status?">How to track my complaint?</button>
+                        <button class="suggestion-btn" data-question="Tell me about government schemes for healthcare">Healthcare schemes</button>
+                    </div>
                 </div>
             </div>
             <div class="chat-input">
-                <input type="text" id="user-input" placeholder="Type your message here...">
+                <input type="text" id="user-input" placeholder="Ask about filing a complaint, government schemes, or tracking grievances...">
                 <button id="send-button">Send</button>
             </div>
             <div class="typing-indicator" id="typing-indicator">
@@ -958,6 +972,37 @@
                     width: 100%;
                 }
             }
+
+            .suggestion-list {
+                margin: 10px 0;
+                padding-left: 20px;
+            }
+
+            .suggestion-list li {
+                margin-bottom: 5px;
+            }
+
+            .suggested-questions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .suggestion-btn {
+                background: #e3f2fd;
+                color: #1976d2;
+                border: none;
+                border-radius: 16px;
+                padding: 6px 12px;
+                font-size: 0.85rem;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+
+            .suggestion-btn:hover {
+                background: #bbdefb;
+            }
         </style>
 
         <script>
@@ -1002,7 +1047,54 @@
                     typingIndicator.classList.add('active');
 
                     try {
-                        const response = await fetch('/api/chat', {
+                        // Check if the message is asking about government schemes
+                        const schemeKeywords = ['scheme', 'program', 'yojana', 'mission', 'initiative'];
+                        const isSchemeQuery = schemeKeywords.some(keyword => 
+                            message.toLowerCase().includes(keyword.toLowerCase())
+                        );
+                        
+                        let response;
+                        
+                        if (isSchemeQuery) {
+                            // Extract category from the message if possible
+                            const categories = ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION'];
+                            let category = 'OTHER';
+                            
+                            for (const cat of categories) {
+                                const catLower = cat.toLowerCase().replace('_', ' ');
+                                if (message.toLowerCase().includes(catLower)) {
+                                    category = cat;
+                                    break;
+                                }
+                            }
+                            
+                            // Fetch scheme information
+                            const schemeResponse = await fetch(`/api/schemes/${category}?description=${encodeURIComponent(message)}`);
+                            const schemeData = await schemeResponse.json();
+                            
+                            if (schemeResponse.ok && schemeData.schemes && schemeData.schemes.length > 0) {
+                                // Format scheme information for display
+                                let schemeText = `Here are some government schemes that might help you:\n\n`;
+                                
+                                schemeData.schemes.forEach(scheme => {
+                                    schemeText += `**${scheme.name}**\n`;
+                                    schemeText += `${scheme.description}\n`;
+                                    schemeText += `How it helps: ${scheme.relevance}\n`;
+                                    if (scheme.link) {
+                                        schemeText += `Learn more: ${scheme.link}\n`;
+                                    }
+                                    schemeText += '\n';
+                                });
+                                
+                                // Hide typing indicator before showing response
+                                typingIndicator.classList.remove('active');
+                                addMessage(schemeText, false);
+                                return;
+                            }
+                        }
+                        
+                        // If not a scheme query or scheme fetch failed, use the regular chat API
+                        response = await fetch('/api/chat', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1040,6 +1132,15 @@
                     if (e.key === 'Enter') {
                         sendMessage();
                     }
+                });
+
+                // Add event listeners for suggestion buttons
+                document.querySelectorAll('.suggestion-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const question = button.getAttribute('data-question');
+                        userInput.value = question;
+                        sendMessage();
+                    });
                 });
             });
         </script>
