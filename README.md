@@ -89,24 +89,6 @@ The application will be available at http://localhost:3000
 - *Citizen*
   - Register through the signup page
 
-## Project Structure
-
-
-├── app.js              # Main application file
-├── model/             # Database models
-│   ├── user.js        # User model
-│   └── post.js        # Post model
-├── public/            # Static files
-├── views/             # EJS templates
-│   ├── layout.ejs     # Base layout
-│   ├── home.ejs       # Home page
-│   ├── login.ejs      # Login page
-│   ├── create.ejs     # Registration page
-│   ├── profile.ejs    # User profile
-│   ├── file-complaint.ejs # Complaint filing
-│   └── ...            # Other templates
-└── package.json       # Project dependencies
-
 
 ## API Endpoints
 
