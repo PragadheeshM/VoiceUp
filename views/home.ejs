@@ -1,10 +1,10 @@
 <%- contentFor('body') %>
     <div class="home-container">
         <!-- Chat Bot Widget -->
-        <div class="chat-widget">
-            <div class="chat-widget-header">
+        <div class="chat-container" id="chat-container" style="display: none;">
+            <div class="chat-header">
                 <h3>Government Grievance Assistant</h3>
-                <button class="close-chat">×</button>
+                <button class="chat-close" id="chat-close">&times;</button>
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
@@ -31,17 +31,12 @@
                     </div>
                 </div>
             </div>
-            <div class="chat-input">
-                <input type="text" id="user-input"
-                    placeholder="Ask about filing a complaint, government schemes, or tracking grievances...">
-                <button id="send-button">Send</button>
-            </div>
-            <div class="typing-indicator" id="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Type your message...">
+                <button class="send-button" id="send-button">Send</button>
             </div>
         </div>
+
         <button class="chat-toggle" id="chat-toggle">
             <i class="fas fa-comments"></i>
         </button>
@@ -682,7 +677,7 @@
                 flex: 1;
             }
 
-            .chat-widget {
+            .chat-container {
                 position: fixed;
                 bottom: 20px;
                 right: 20px;
@@ -696,11 +691,11 @@
                 z-index: 1000;
             }
 
-            .chat-widget.active {
+            .chat-container.active {
                 display: flex;
             }
 
-            .chat-widget-header {
+            .chat-header {
                 padding: 15px;
                 background: #007bff;
                 color: white;
@@ -710,7 +705,7 @@
                 align-items: center;
             }
 
-            .close-chat {
+            .chat-close {
                 background: none;
                 border: none;
                 color: white;
@@ -742,21 +737,21 @@
                 color: #333;
             }
 
-            .chat-input {
+            .chat-input-container {
                 padding: 15px;
                 border-top: 1px solid #eee;
                 display: flex;
                 gap: 10px;
             }
 
-            .chat-input input {
+            .chat-input {
                 flex: 1;
                 padding: 10px;
                 border: 1px solid #ddd;
                 border-radius: 5px;
             }
 
-            .chat-input button {
+            .send-button {
                 padding: 10px 20px;
                 background: #007bff;
                 color: white;
@@ -782,198 +777,6 @@
                 font-size: 24px;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
                 z-index: 999;
-            }
-
-            .typing-indicator {
-                display: none;
-                padding: 10px 15px;
-                background: #f0f0f0;
-                border-radius: 10px;
-                margin: 10px;
-                width: fit-content;
-            }
-
-            .typing-indicator.active {
-                display: flex;
-                gap: 5px;
-            }
-
-            .typing-indicator span {
-                width: 8px;
-                height: 8px;
-                background: #007bff;
-                border-radius: 50%;
-                animation: typing 1s infinite;
-            }
-
-            .typing-indicator span:nth-child(2) {
-                animation-delay: 0.2s;
-            }
-
-            .typing-indicator span:nth-child(3) {
-                animation-delay: 0.4s;
-            }
-
-            @keyframes typing {
-
-                0%,
-                100% {
-                    transform: translateY(0);
-                }
-
-                50% {
-                    transform: translateY(-5px);
-                }
-            }
-
-            /* Process Section Styles */
-            .process-section {
-                background-color: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--card-shadow);
-                padding: 2rem;
-                margin-bottom: 3rem;
-            }
-
-            .process-title {
-                text-align: center;
-                margin-bottom: 2rem;
-                font-size: 1.8rem;
-                color: var(--text-color);
-                font-weight: 600;
-            }
-
-            .steps-container {
-                display: flex;
-                gap: 1rem;
-                justify-content: space-between;
-                position: relative;
-            }
-
-            .steps-container:before {
-                content: "";
-                position: absolute;
-                top: 25px;
-                left: 50px;
-                right: 50px;
-                height: 2px;
-                background: #eaeaea;
-                z-index: 0;
-            }
-
-            .step {
-                flex: 1;
-                text-align: center;
-                position: relative;
-                z-index: 1;
-            }
-
-            .step-number {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background: var(--primary-color);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.2rem;
-                font-weight: bold;
-                margin: 0 auto 1rem;
-            }
-
-            .step-content h4 {
-                margin: 0 0 0.5rem;
-                color: var(--text-color);
-                font-size: 1rem;
-            }
-
-            .step-content p {
-                color: var(--text-muted);
-                font-size: 0.9rem;
-                margin: 0;
-            }
-
-            /* Help Section Styles */
-            .help-section {
-                background-color: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--card-shadow);
-                padding: 2rem;
-                margin-bottom: 3rem;
-            }
-
-            .help-title {
-                text-align: center;
-                margin-bottom: 1rem;
-                font-size: 1.8rem;
-                color: var(--text-color);
-                font-weight: 600;
-            }
-
-            .help-description {
-                text-align: center;
-                color: var(--text-muted);
-                margin-bottom: 2rem;
-            }
-
-            .support-options {
-                display: flex;
-                justify-content: space-around;
-                flex-wrap: wrap;
-                gap: 1.5rem;
-            }
-
-            .support-option {
-                text-align: center;
-                flex: 1;
-                min-width: 200px;
-                padding: 1.5rem;
-                background: #f8f9fa;
-                border-radius: var(--border-radius);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
-
-            .support-option:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-
-            .option-icon {
-                font-size: 2rem;
-                margin-bottom: 1rem;
-                display: block;
-            }
-
-            .option-title {
-                margin: 0 0 0.5rem;
-                color: var(--text-color);
-                font-size: 1.1rem;
-            }
-
-            .option-detail {
-                color: var(--text-muted);
-                font-size: 0.9rem;
-                margin: 0;
-            }
-
-            @media (max-width: 768px) {
-                .steps-container {
-                    flex-direction: column;
-                    gap: 2rem;
-                }
-
-                .steps-container:before {
-                    display: none;
-                }
-
-                .support-options {
-                    flex-direction: column;
-                }
-
-                .support-option {
-                    width: 100%;
-                }
             }
 
             .suggestion-list {
@@ -1010,94 +813,48 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const chatWidget = document.querySelector('.chat-widget');
+                const chatContainer = document.getElementById('chat-container');
                 const chatToggle = document.getElementById('chat-toggle');
-                const closeChat = document.querySelector('.close-chat');
-                const userInput = document.getElementById('user-input');
+                const chatClose = document.getElementById('chat-close');
+                const chatInput = document.getElementById('chat-input');
                 const sendButton = document.getElementById('send-button');
                 const chatMessages = document.getElementById('chat-messages');
-                const typingIndicator = document.getElementById('typing-indicator');
 
+                // Toggle chat visibility
                 chatToggle.addEventListener('click', () => {
-                    chatWidget.classList.add('active');
+                    chatContainer.style.display = chatContainer.style.display === 'none' ? 'flex' : 'none';
                 });
 
-                closeChat.addEventListener('click', () => {
-                    chatWidget.classList.remove('active');
+                chatClose.addEventListener('click', () => {
+                    chatContainer.style.display = 'none';
                 });
 
                 function addMessage(message, isUser) {
                     const messageDiv = document.createElement('div');
                     messageDiv.classList.add('message');
                     messageDiv.classList.add(isUser ? 'user' : 'bot');
-                    messageDiv.innerHTML = `<p>${message}</p>`;
+
+                    // Format message with line breaks
+                    const formattedMessage = message.replace(/\n/g, '<br>');
+                    messageDiv.innerHTML = `<p>${formattedMessage}</p>`;
+
                     chatMessages.appendChild(messageDiv);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
 
                 async function sendMessage() {
-                    const message = userInput.value.trim();
+                    const message = chatInput.value.trim();
                     if (!message) return;
 
                     // Disable input while processing
-                    userInput.disabled = true;
+                    chatInput.disabled = true;
                     sendButton.disabled = true;
 
                     addMessage(message, true);
-                    userInput.value = '';
-
-                    // Show typing indicator
-                    typingIndicator.classList.add('active');
+                    chatInput.value = '';
 
                     try {
-                        // Check if the message is asking about government schemes
-                        const schemeKeywords = ['scheme', 'program', 'yojana', 'mission', 'initiative'];
-                        const isSchemeQuery = schemeKeywords.some(keyword =>
-                            message.toLowerCase().includes(keyword.toLowerCase())
-                        );
-
-                        let response;
-
-                        if (isSchemeQuery) {
-                            // Extract category from the message if possible
-                            const categories = ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION'];
-                            let category = 'OTHER';
-
-                            for (const cat of categories) {
-                                const catLower = cat.toLowerCase().replace('_', ' ');
-                                if (message.toLowerCase().includes(catLower)) {
-                                    category = cat;
-                                    break;
-                                }
-                            }
-
-                            // Fetch scheme information
-                            const schemeResponse = await fetch(`/api/schemes/${category}?description=${encodeURIComponent(message)}`);
-                            const schemeData = await schemeResponse.json();
-
-                            if (schemeResponse.ok && schemeData.schemes && schemeData.schemes.length > 0) {
-                                // Format scheme information for display
-                                let schemeText = `Here are some government schemes that might help you:\n\n`;
-
-                                schemeData.schemes.forEach(scheme => {
-                                    schemeText += `**${scheme.name}**\n`;
-                                    schemeText += `${scheme.description}\n`;
-                                    schemeText += `How it helps: ${scheme.relevance}\n`;
-                                    if (scheme.link) {
-                                        schemeText += `Learn more: ${scheme.link}\n`;
-                                    }
-                                    schemeText += '\n';
-                                });
-
-                                // Hide typing indicator before showing response
-                                typingIndicator.classList.remove('active');
-                                addMessage(schemeText, false);
-                                return;
-                            }
-                        }
-
-                        // If not a scheme query or scheme fetch failed, use the regular chat API
-                        response = await fetch('/api/chat', {
+                        const response = await fetch('/chat', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1112,26 +869,23 @@
                         }
 
                         if (data.response) {
-                            // Hide typing indicator before showing response
-                            typingIndicator.classList.remove('active');
                             addMessage(data.response, false);
                         } else {
                             throw new Error('No response from server');
                         }
                     } catch (error) {
                         console.error('Chat error:', error);
-                        typingIndicator.classList.remove('active');
-                        addMessage('Sorry, I encountered an error. Please try again later.', false);
+                        addMessage('I apologize, but I encountered an error processing your request. Please try again in a moment.', false);
                     } finally {
                         // Re-enable input
-                        userInput.disabled = false;
+                        chatInput.disabled = false;
                         sendButton.disabled = false;
-                        userInput.focus();
+                        chatInput.focus();
                     }
                 }
 
                 sendButton.addEventListener('click', sendMessage);
-                userInput.addEventListener('keypress', (e) => {
+                chatInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         sendMessage();
                     }
@@ -1141,9 +895,12 @@
                 document.querySelectorAll('.suggestion-btn').forEach(button => {
                     button.addEventListener('click', () => {
                         const question = button.getAttribute('data-question');
-                        userInput.value = question;
+                        chatInput.value = question;
                         sendMessage();
                     });
                 });
             });
         </script>
+
+        <link rel="stylesheet" href="/css/chatbot.css">
+        <link rel="stylesheet" href="/css/chatbot.css">

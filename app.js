@@ -20,8 +20,21 @@ if (!process.env.GEMINI_API_KEY) {
   process.exit(1);
 }
 
-// Initialize Gemini AI
+// Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Function to get response from Gemini
+async function getGeminiResponse(prompt) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error('Error getting Gemini response:', error);
+    return "I apologize, but I'm having trouble processing your request at the moment. Please try again later.";
+  }
+}
 
 // Define Complaint model schema if it doesn't exist yet
 const complaintSchema = new mongoose.Schema({
@@ -752,58 +765,69 @@ app.post('/track-status', async (req, res) => {
   }
 });
 
-// Chat API endpoint
-app.post('/api/chat', async (req, res) => {
+// Chat route
+app.post('/chat', async (req, res) => {
   try {
     const { message } = req.body;
-
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Get the Gemini model with flash-1.5 configuration
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1024,
-      }
-    });
+    // Get the Gemini 2.0 Flash model
+    const flashModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    // Create a system prompt for the government grievance assistant
-    const systemPrompt = `You are a government grievance assistant chatbot designed to help Indian citizens understand and use the government grievance redressal system. You specialize in helping users:
+    // Create a system prompt with information about the portal
+    const systemPrompt = `You are a helpful assistant for the Government Complaint Portal. Here's what you need to know:
 
-1. Identify the correct department for their complaint.
-2. Understand the grievance filing process on official platforms like CPGRAMS (Centralized Public Grievance Redress And Monitoring System).
-3. Find relevant government schemes that may assist them.
-4. Answer questions related to ministry responsibilities, complaint tracking, timelines, and escalation procedures.
+1. Portal Features:
+- User Authentication: Citizens can register and login
+- Complaint Management: Users can file, track, and view complaint history
+- Admin Dashboard: For managing user accounts and complaints
+- Modern UI: Built with Tailwind CSS
 
-When helping users:
-- Be polite, professional, and empathetic
-- Provide accurate information about government departments and schemes
-- Explain processes in simple, step-by-step terms
-- Suggest relevant government schemes when appropriate
-- Guide users on how to track their complaints
-- Explain escalation procedures when needed
+2. User Roles:
+- Citizens: Can file and track complaints
+- Officers: Can manage and respond to complaints
+- Admins: Can manage all aspects of the system
 
-If a user is asking about filing a complaint, guide them to use the complaint filing system on this portal.`;
+3. Complaint Features:
+- Categorization of complaints
+- Priority levels
+- Status tracking
+- Comment and update system
 
-    // Generate response with the system prompt
-    const result = await model.generateContent([
-      { role: "system", content: systemPrompt },
-      { role: "user", content: message }
-    ]);
+4. Tech Stack:
+- Backend: Node.js, Express.js, MongoDB
+- Frontend: EJS Templates, Tailwind CSS
+- Authentication: JWT, Bcrypt
 
-    const response = await result.response;
-    const text = response.text();
+5. Default Accounts:
+- Admin: admin@example.com / admin123
+- Citizens: Register through signup page
+
+Please help users with:
+- Understanding how to file complaints
+- Tracking complaint status
+- Explaining the portal's features
+- Guiding them through the registration process
+- Answering questions about the system
+
+User's message: "${message}"`;
+
+    // Generate content with the system prompt and user message
+    const chatResult = await flashModel.generateContent(systemPrompt);
+    const chatResponse = await chatResult.response;
+    const text = chatResponse.text();
+
+    if (!text) {
+      throw new Error('No response generated');
+    }
 
     res.json({ response: text });
   } catch (error) {
-    console.error('Error in chat API:', error);
+    console.error('Chat error:', error);
     res.status(500).json({
-      error: 'An error occurred while processing your request',
+      error: 'I apologize, but I encountered an error processing your request. Please try again in a moment.',
       details: error.message
     });
   }
