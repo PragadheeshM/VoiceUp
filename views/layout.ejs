@@ -17,22 +17,27 @@
             <a href="/" class="navbar-brand">Government Portal</a>
             <nav class="navbar-links">
                 <a href="/">Home</a>
-                <% if (!locals.user || locals.user.role !== 'ADMIN') { %>
+                <% if (!locals.user) { %>
                     <a href="/complaints">Complaints</a>
+                    <a href="/currentStatus">Current Status</a>
+                <% } else if (locals.user.role === 'CITIZEN') { %>
+                    <a href="/complaints">Complaints</a>
+                    <a href="/currentStatus">Current Status</a>
+                    <a href="/my-complaints">My Complaints</a>
                 <% } %>
-                <a href="/currentStatus">Current Status</a>
+                
                 <% if (locals.user) { %>
-                    <% if (locals.user.role==='ADMIN' ) { %>
+                    <% if (locals.user.role === 'ADMIN') { %>
                         <a href="/admin">Admin Dashboard</a>
-                        <% } else { %>
-                            <a href="/my-complaints">My Complaints</a>
-                        <% } %>
-                            <a href="/profile/<%= locals.user.username %>">Profile</a>
-                            <a href="/logout">Logout</a>
-                            <% } else { %>
-                                <a href="/login">Login</a>
-                                <a href="/create">Sign Up</a>
-                                <% } %>
+                    <% } else if (locals.user.role === 'OFFICER') { %>
+                        <a href="/assigned-complaints">My Assigned Complaints</a>
+                    <% } %>
+                    <a href="/profile/<%= locals.user.username %>">Profile</a>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/create">Sign Up</a>
+                <% } %>
             </nav>
         </div>
     </header>

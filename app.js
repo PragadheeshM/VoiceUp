@@ -76,6 +76,11 @@ const complaintSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  assignedOfficer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -524,6 +529,56 @@ app.post('/complaints', isLoggedIn, async (req, res) => {
     // Generate unique tracking ID
     const trackingId = generateTrackingId();
 
+    // Find a matching officer based on city and department/category
+    let assignedOfficer = null;
+    try {
+      // First try to find an officer in the same city with matching department
+      const matchingOfficer = await usermodel.findOne({
+        role: 'OFFICER',
+        city: city,
+        department: category
+      });
+
+      if (matchingOfficer) {
+        assignedOfficer = matchingOfficer._id;
+        console.log(`Assigned officer ${matchingOfficer.username} to complaint based on city and department match`);
+      } else {
+        // If no exact match, try to find an officer in the same city with any department
+        const cityOfficer = await usermodel.findOne({
+          role: 'OFFICER',
+          city: city
+        });
+
+        if (cityOfficer) {
+          assignedOfficer = cityOfficer._id;
+          console.log(`Assigned officer ${cityOfficer.username} to complaint based on city match only`);
+        } else {
+          // If no city match, try to find an officer with matching department
+          const departmentOfficer = await usermodel.findOne({
+            role: 'OFFICER',
+            department: category
+          });
+
+          if (departmentOfficer) {
+            assignedOfficer = departmentOfficer._id;
+            console.log(`Assigned officer ${departmentOfficer.username} to complaint based on department match only`);
+          } else {
+            // If no officer match is found, assign to an admin
+            const admin = await usermodel.findOne({ role: 'ADMIN' });
+            if (admin) {
+              assignedOfficer = admin._id;
+              console.log(`No matching officer found. Assigned to admin ${admin.username}`);
+            } else {
+              console.log('No matching officer or admin found. Complaint will be unassigned.');
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error finding matching officer:', error);
+      // Continue without assigning an officer if there's an error
+    }
+
     // Create complaint using the main Complaint model
     const complaint = new Complaint({
       title,
@@ -533,7 +588,8 @@ app.post('/complaints', isLoggedIn, async (req, res) => {
       category,
       status: 'PENDING',
       priority: 'medium',
-      trackingId
+      trackingId,
+      assignedOfficer // Add the assigned officer if found
     });
 
     await complaint.save();
@@ -599,10 +655,36 @@ app.get('/admin-complaints', isLoggedIn, isOfficer, async (req, res) => {
   try {
     // Fetch all complaints using the main Complaint model
     const complaints = await Complaint.find().sort({ createdAt: -1 });
+    
+    // Get all officers for assignment dropdown
+    const officers = await usermodel.find({ role: 'OFFICER' });
+    
+    // Transform complaints to include category field and populate assigned officer
+    const transformedComplaints = await Promise.all(complaints.map(async complaint => {
+      const complaintObj = complaint.toObject();
+      
+      // Set default category if not present
+      complaintObj.category = complaintObj.category || 'OTHER';
+      
+      // Populate assigned officer if exists
+      if (complaintObj.assignedOfficer) {
+        const officer = await usermodel.findById(complaintObj.assignedOfficer);
+        if (officer) {
+          complaintObj.assignedOfficer = {
+            _id: officer._id,
+            username: officer.username,
+            department: officer.department
+          };
+        }
+      }
+      
+      return complaintObj;
+    }));
 
     res.render('admin-complaints', {
       title: 'Manage Complaints',
-      complaints
+      complaints: transformedComplaints,
+      officers
     });
   } catch (error) {
     console.error('Error fetching complaints for admin:', error);
@@ -649,10 +731,26 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
     // Fetch all complaints using the main Complaint model
     const complaints = await Complaint.find().sort({ createdAt: -1 });
 
-    // Transform complaints to include category field
-    const transformedComplaints = complaints.map(complaint => ({
-      ...complaint.toObject(),
-      category: complaint.category || 'OTHER' // Use category field as category, fallback to 'OTHER'
+    // Transform complaints to include category field and populate assigned officer
+    const transformedComplaints = await Promise.all(complaints.map(async complaint => {
+      const complaintObj = complaint.toObject();
+      
+      // Set default category if not present
+      complaintObj.category = complaintObj.category || 'OTHER';
+      
+      // Populate assigned officer if exists
+      if (complaintObj.assignedOfficer) {
+        const officer = await usermodel.findById(complaintObj.assignedOfficer);
+        if (officer) {
+          complaintObj.assignedOfficer = {
+            _id: officer._id,
+            username: officer.username,
+            department: officer.department
+          };
+        }
+      }
+      
+      return complaintObj;
     }));
 
     res.render('admin-dashboard', {
@@ -670,6 +768,24 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
   }
 });
 
+// View all officers route
+app.get('/officers', isLoggedIn, isAdmin, async (req, res) => {
+  try {
+    const officers = await usermodel.find({ role: 'OFFICER' }).sort({ username: 1 });
+    
+    res.render('officers', {
+      title: 'All Officers',
+      officers
+    });
+  } catch (error) {
+    console.error('Error fetching officers:', error);
+    res.status(500).render('officers', {
+      title: 'All Officers',
+      error: 'Error loading officers. Please try again later.'
+    });
+  }
+});
+
 // Create officer route
 app.get('/create-officer', isLoggedIn, isAdmin, (req, res) => {
   res.render('create-officer', { title: 'Create Officer' });
@@ -677,7 +793,7 @@ app.get('/create-officer', isLoggedIn, isAdmin, (req, res) => {
 
 app.post('/create-officer', isLoggedIn, isAdmin, async (req, res) => {
   try {
-    const { username, email, age, password } = req.body;
+    const { username, email, password, department, city, state } = req.body;
 
     // Check if user already exists
     const existingUser = await usermodel.findOne({ email });
@@ -688,6 +804,14 @@ app.post('/create-officer', isLoggedIn, isAdmin, async (req, res) => {
       });
     }
 
+    // Validate required fields for officers
+    if (!department || !city || !state) {
+      return res.render('create-officer', {
+        title: 'Create Officer',
+        error: 'Department, city, and state are required for officer accounts'
+      });
+    }
+
     // Create new officer account
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
@@ -695,10 +819,12 @@ app.post('/create-officer', isLoggedIn, isAdmin, async (req, res) => {
     await usermodel.create({
       username,
       name: username,
-      age,
       email,
       password: hash,
-      role: 'OFFICER'
+      role: 'OFFICER',
+      department,
+      city,
+      state
     });
 
     res.redirect('/admin');
@@ -866,6 +992,90 @@ app.get('/api/schemes/:category', async (req, res) => {
     res.status(500).json({
       error: 'An error occurred while fetching scheme information',
       details: error.message
+    });
+  }
+});
+
+// View all citizens route
+app.get('/citizens', isLoggedIn, isAdmin, async (req, res) => {
+  try {
+    const citizens = await usermodel.find({ role: 'CITIZEN' }).sort({ username: 1 });
+    
+    res.render('citizens', {
+      title: 'All Citizens',
+      citizens
+    });
+  } catch (error) {
+    console.error('Error fetching citizens:', error);
+    res.status(500).render('citizens', {
+      title: 'All Citizens',
+      error: 'Error loading citizens. Please try again later.'
+    });
+  }
+});
+
+// Assign officer to complaint route
+app.post('/assign-officer', isLoggedIn, isAdmin, async (req, res) => {
+  try {
+    const { complaintId, officerId } = req.body;
+
+    if (!complaintId) {
+      return res.status(400).json({ error: 'Complaint ID is required' });
+    }
+
+    const complaint = await Complaint.findById(complaintId);
+    if (!complaint) {
+      return res.status(404).json({ error: 'Complaint not found' });
+    }
+
+    // If officerId is empty, remove the assignment
+    if (!officerId) {
+      complaint.assignedOfficer = null;
+    } else {
+      // Verify the officer exists
+      const officer = await usermodel.findById(officerId);
+      if (!officer || officer.role !== 'OFFICER') {
+        return res.status(400).json({ error: 'Invalid officer selected' });
+      }
+      
+      complaint.assignedOfficer = officerId;
+    }
+
+    complaint.updatedAt = new Date();
+    await complaint.save();
+
+    // Redirect back to the admin dashboard
+    res.redirect('/admin');
+  } catch (error) {
+    console.error('Error assigning officer to complaint:', error);
+    res.status(500).json({ error: 'Failed to assign officer to complaint' });
+  }
+});
+
+// View assigned complaints for officers
+app.get('/assigned-complaints', isLoggedIn, isOfficer, async (req, res) => {
+  try {
+    // Fetch complaints assigned to the current officer
+    const complaints = await Complaint.find({ 
+      assignedOfficer: req.user.userId 
+    }).sort({ createdAt: -1 });
+
+    // Transform complaints to include category field
+    const transformedComplaints = complaints.map(complaint => {
+      const complaintObj = complaint.toObject();
+      complaintObj.category = complaintObj.category || 'OTHER';
+      return complaintObj;
+    });
+
+    res.render('assigned-complaints', {
+      title: 'My Assigned Complaints',
+      complaints: transformedComplaints
+    });
+  } catch (error) {
+    console.error('Error fetching assigned complaints:', error);
+    res.status(500).render('assigned-complaints', {
+      title: 'My Assigned Complaints',
+      error: 'Error loading assigned complaints. Please try again later.'
     });
   }
 });

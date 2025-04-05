@@ -30,13 +30,108 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required class="form-input">
                 </div>
-                <button type="submit" class="btn btn-primary">Create Officer Account</button>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required class="form-input">
+                        <option value="">Select Department</option>
+                        <option value="INFRASTRUCTURE">Infrastructure</option>
+                        <option value="WATER_SUPPLY">Water Supply</option>
+                        <option value="ELECTRICITY">Electricity</option>
+                        <option value="SANITATION">Sanitation</option>
+                        <option value="HEALTHCARE">Healthcare</option>
+                        <option value="EDUCATION">Education</option>
+                        <option value="TRANSPORTATION">Transportation</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <select id="state" name="state" required class="form-input">
+                        <option value="">Select State</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <select id="city" name="city" required class="form-input" disabled>
+                        <option value="">Select City</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Officer</button>
             </form>
             <p class="form-footer">
                 <a href="/admin-dashboard" class="link">Back to Dashboard</a>
             </p>
         </div>
     </div>
+
+    <script>
+        const apiKey = 'NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA==';
+        const countryCode = 'IN'; // India
+
+        // Fetch states when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            const stateSelect = document.getElementById('state');
+            const citySelect = document.getElementById('city');
+
+            try {
+                const response = await fetch(`https://api.countrystatecity.in/v1/countries/${countryCode}/states`, {
+                    headers: {
+                        'X-CSCAPI-KEY': apiKey
+                    }
+                });
+                const states = await response.json();
+
+                // Sort states alphabetically
+                states.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Add states to select
+                states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.iso2;
+                    option.textContent = state.name;
+                    stateSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching states:', error);
+            }
+
+            // Add event listener for state selection
+            stateSelect.addEventListener('change', async () => {
+                const selectedState = stateSelect.value;
+                citySelect.disabled = true;
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                if (selectedState) {
+                    try {
+                        const response = await fetch(
+                            `https://api.countrystatecity.in/v1/countries/${countryCode}/states/${selectedState}/cities`,
+                            {
+                                headers: {
+                                    'X-CSCAPI-KEY': apiKey
+                                }
+                            }
+                        );
+                        const cities = await response.json();
+
+                        // Sort cities alphabetically
+                        cities.sort((a, b) => a.name.localeCompare(b.name));
+
+                        // Add cities to select
+                        cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.name;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+
+                        citySelect.disabled = false;
+                    } catch (error) {
+                        console.error('Error fetching cities:', error);
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 

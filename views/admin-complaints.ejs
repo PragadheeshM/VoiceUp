@@ -73,6 +73,30 @@
                                     </div>
                                 </div>
 
+                                <div class="officer-assignment">
+                                    <p class="assigned-officer">
+                                        <span class="officer-icon">👮</span>
+                                        <% if (complaint.assignedOfficer) { %>
+                                            Assigned to: <%= complaint.assignedOfficer.username || 'Officer' %>
+                                        <% } else { %>
+                                            Not assigned
+                                        <% } %>
+                                    </p>
+                                    <form action="/assign-officer" method="POST" class="assign-form">
+                                        <input type="hidden" name="complaintId" value="<%= complaint._id %>">
+                                        <select name="officerId" class="officer-select">
+                                            <option value="">Select Officer</option>
+                                            <% officers.forEach(officer => { %>
+                                                <option value="<%= officer._id %>" 
+                                                    <%= complaint.assignedOfficer && complaint.assignedOfficer._id.toString() === officer._id.toString() ? 'selected' : '' %>>
+                                                    <%= officer.username %> (<%= officer.department %>)
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                                    </form>
+                                </div>
+
                                 <div class="admin-actions">
                                     <form action="/update-complaint-status" method="POST" class="status-form">
                                         <input type="hidden" name="complaintId" value="<%= complaint._id %>">
@@ -385,6 +409,40 @@
                 .status-form {
                     flex-direction: column;
                 }
+            }
+
+            .officer-assignment {
+                margin: 1rem 0;
+                padding: 0.75rem;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                border: 1px solid #e9ecef;
+            }
+            
+            .assigned-officer {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+                font-size: 0.9rem;
+                color: #495057;
+            }
+            
+            .officer-icon {
+                color: #73003b;
+            }
+            
+            .assign-form {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .officer-select {
+                flex: 1;
+                padding: 0.5rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 0.9rem;
             }
         </style>
 

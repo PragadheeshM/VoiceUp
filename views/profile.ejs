@@ -84,6 +84,20 @@
                         <label class="info-label">Role</label>
                         <p class="info-value"><%= user.role %></p>
                     </div>
+                    <% if (user.role === 'OFFICER') { %>
+                        <div class="info-group">
+                            <label class="info-label">Department</label>
+                            <p class="info-value"><%= user.department.replace('_', ' ') %></p>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">City</label>
+                            <p class="info-value"><%= user.city %></p>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">State</label>
+                            <p class="info-value"><%= user.state %></p>
+                        </div>
+                    <% } %>
                 </div>
             </div>
 
