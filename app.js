@@ -334,7 +334,7 @@ app.post('/create', async (req, res) => {
         })
         let token = jwt.sign({ email: email, role: userRole }, "shhh");
         res.cookie("Token", token);
-        res.redirect('/profile');
+        res.redirect('/home');
       })
     })
   }

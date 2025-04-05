@@ -19,10 +19,8 @@
                 <a href="/">Home</a>
                 <% if (!locals.user) { %>
                     <a href="/complaints">Complaints</a>
-                    <a href="/currentStatus">Current Status</a>
                 <% } else if (locals.user.role === 'CITIZEN') { %>
                     <a href="/complaints">Complaints</a>
-                    <a href="/currentStatus">Current Status</a>
                     <a href="/my-complaints">My Complaints</a>
                 <% } %>
                 
