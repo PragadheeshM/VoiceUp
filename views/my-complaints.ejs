@@ -23,7 +23,7 @@
                             <div class="complaint-card">
                                 <div class="complaint-header">
                                     <div class="category-badge">
-                                        <%= complaint.category.replace('_', ' ') %>
+                                        <%= complaint.category.replace('_', ' ' ) %>
                                     </div>
                                     <div class="status-badge <%= complaint.status.toLowerCase() %>">
                                         <%= complaint.status %>
@@ -47,6 +47,9 @@
                                     </div>
                                     <div class="complaint-date">
                                         Filed on: <%= new Date(complaint.createdAt).toLocaleDateString() %>
+                                    </div>
+                                    <div class="tracking-id">
+                                        ID: <%= complaint.trackingId %>
                                     </div>
                                 </div>
 
@@ -197,6 +200,13 @@
             .complaint-date {
                 color: #666;
                 font-size: 0.85rem;
+            }
+
+            .tracking-id {
+                font-family: monospace;
+                font-size: 0.9rem;
+                color: #6c757d;
+                margin-top: 0.5rem;
             }
 
             .no-complaints {

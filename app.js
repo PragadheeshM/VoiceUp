@@ -42,6 +42,11 @@ const complaintSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  trackingId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   priority: {
     type: String,
     required: true,
@@ -375,7 +380,7 @@ function isLoggedIn(req, res, next) {
   try {
     let data = jwt.verify(req.cookies.Token, "shhh");
     console.log('JWT token verified, user data:', data);
-    
+
     // Make sure the user object has all required fields
     if (!data.userId) {
       console.error('JWT token missing userId:', data);
@@ -385,7 +390,7 @@ function isLoggedIn(req, res, next) {
         error: 'Your session is invalid. Please login again.'
       });
     }
-    
+
     // Set the user data in the request object
     req.user = {
       userId: data.userId,
@@ -393,7 +398,7 @@ function isLoggedIn(req, res, next) {
       role: data.role,
       username: data.username
     };
-    
+
     next();
   } catch (error) {
     // JWT verification failed
@@ -456,10 +461,17 @@ app.get('/complaints', isLoggedIn, (req, res) => {
   });
 });
 
+// Add this function before the complaint creation route
+function generateTrackingId() {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substr(2, 5);
+  return `GRV-${timestamp}-${random}`.toUpperCase();
+}
+
 app.post('/complaints', isLoggedIn, async (req, res) => {
   try {
     const { title, description, location } = req.body;
-    
+
     // Make sure we have a valid user ID
     if (!req.user.userId) {
       console.error('User object missing userId:', req.user);
@@ -480,9 +492,12 @@ app.post('/complaints', isLoggedIn, async (req, res) => {
 
     // Use AI to categorize the complaint
     const category = await categorizeComplaint(description);
-    
+
     // Get relevant government scheme information
     const schemeInfo = await getGovernmentSchemeInfo(category, description);
+
+    // Generate unique tracking ID
+    const trackingId = generateTrackingId();
 
     // Create complaint using the main Complaint model
     const complaint = new Complaint({
@@ -492,15 +507,16 @@ app.post('/complaints', isLoggedIn, async (req, res) => {
       userId: req.user.userId,
       category,
       status: 'PENDING',
-      priority: 'medium'
+      priority: 'medium',
+      trackingId
     });
 
     await complaint.save();
 
-    // Redirect with success message and scheme information
+    // Redirect with success message, tracking ID, and scheme information
     res.render('file-complaint', {
       title: 'File a Complaint',
-      success: 'Complaint submitted successfully and categorized by AI',
+      success: `Complaint submitted successfully! Your tracking ID is: ${trackingId}`,
       categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER'],
       schemeInfo: schemeInfo
     });
@@ -574,31 +590,28 @@ app.get('/admin-complaints', isLoggedIn, isOfficer, async (req, res) => {
 
 app.post('/update-complaint-status', isLoggedIn, isOfficer, async (req, res) => {
   try {
-    const { complaintId, status, comment } = req.body;
+    const { complaintId, status } = req.body;
+
+    if (!complaintId || !status) {
+      return res.status(400).json({ error: 'Complaint ID and status are required' });
+    }
 
     const complaint = await Complaint.findById(complaintId);
     if (!complaint) {
-      return res.status(404).send('Complaint not found');
+      return res.status(404).json({ error: 'Complaint not found' });
     }
 
-    // Update status
+    // Update status and last updated timestamp
     complaint.status = status;
-    complaint.updatedAt = Date.now();
-
-    // Add comment if provided
-    if (comment) {
-      complaint.comments.push({
-        text: comment,
-        userId: req.user.userId,
-        role: req.user.role
-      });
-    }
+    complaint.updatedAt = new Date();
 
     await complaint.save();
-    res.redirect('/admin-complaints');
+
+    // Redirect back to the admin dashboard
+    res.redirect('/admin');
   } catch (error) {
     console.error('Error updating complaint status:', error);
-    res.status(500).send('Error updating complaint');
+    res.status(500).json({ error: 'Failed to update complaint status' });
   }
 });
 
@@ -611,11 +624,17 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
     // Fetch all complaints using the main Complaint model
     const complaints = await Complaint.find().sort({ createdAt: -1 });
 
+    // Transform complaints to include category field
+    const transformedComplaints = complaints.map(complaint => ({
+      ...complaint.toObject(),
+      category: complaint.category || 'OTHER' // Use category field as category, fallback to 'OTHER'
+    }));
+
     res.render('admin-dashboard', {
       title: 'Admin Dashboard',
       officers,
       citizens,
-      complaints
+      complaints: transformedComplaints
     });
   } catch (error) {
     console.error('Error fetching admin dashboard data:', error);
@@ -696,60 +715,39 @@ app.post('/delete-user/:userId', isLoggedIn, isAdmin, async (req, res) => {
 // Track application status route
 app.post('/track-status', async (req, res) => {
   try {
-    const { applicationId, email } = req.body;
+    const { trackingId } = req.body;
 
-    // In a real application, you would query your database for the application
-    // For now, we'll use sample data
-    const sampleApplications = [
-      {
-        id: 'APP001',
-        status: 'PENDING',
-        submittedDate: new Date(Date.now() - 86400000), // 1 day ago
-        lastUpdated: new Date(Date.now() - 43200000), // 12 hours ago
-        type: 'Document Verification',
-        description: 'Passport renewal application'
-      },
-      {
-        id: 'APP002',
-        status: 'PROCESSING',
-        submittedDate: new Date(Date.now() - 172800000), // 2 days ago
-        lastUpdated: new Date(Date.now() - 86400000), // 1 day ago
-        type: 'License Renewal',
-        description: 'Driver\'s license renewal'
-      },
-      {
-        id: 'APP003',
-        status: 'RESOLVED',
-        submittedDate: new Date(Date.now() - 259200000), // 3 days ago
-        lastUpdated: new Date(Date.now() - 172800000), // 2 days ago
-        type: 'Tax Services',
-        description: 'Income tax filing'
-      }
-    ];
+    // Find the complaint by tracking ID
+    const complaint = await Complaint.findOne({ trackingId });
 
-    // Find the application with the matching ID and email
-    // In a real application, you would verify the email matches the application
-    const application = sampleApplications.find(app => app.id === applicationId);
-
-    if (application) {
-      // Render the application status page with the found application
+    if (complaint) {
+      // Render the application status page with the found complaint
       res.render('application-status', {
-        title: 'Application Status',
-        application,
-        email
+        title: 'Complaint Status',
+        complaint: {
+          id: complaint.trackingId,
+          type: complaint.category.replace('_', ' '),
+          description: complaint.description,
+          status: complaint.status,
+          submittedDate: complaint.createdAt,
+          lastUpdated: complaint.updatedAt,
+          title: complaint.title,
+          location: complaint.location,
+          priority: complaint.priority
+        }
       });
     } else {
-      // If no application is found, redirect back to home with an error message
+      // If no complaint is found, redirect back to home with an error message
       res.render('home', {
         title: 'Home',
-        error: 'No application found with the provided ID and email. Please check your details and try again.'
+        error: 'No complaint found with the provided tracking ID. Please check your tracking ID and try again.'
       });
     }
   } catch (error) {
-    console.error('Error tracking application status:', error);
+    console.error('Error tracking complaint status:', error);
     res.render('home', {
       title: 'Home',
-      error: 'An error occurred while tracking your application. Please try again later.'
+      error: 'An error occurred while tracking your complaint. Please try again later.'
     });
   }
 });
@@ -797,7 +795,7 @@ If a user is asking about filing a complaint, guide them to use the complaint fi
       { role: "system", content: systemPrompt },
       { role: "user", content: message }
     ]);
-    
+
     const response = await result.response;
     const text = response.text();
 
@@ -816,16 +814,16 @@ app.get('/api/schemes/:category', async (req, res) => {
   try {
     const { category } = req.params;
     const { description } = req.query;
-    
+
     // Validate category
     const validCategories = ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER'];
     if (!validCategories.includes(category)) {
       return res.status(400).json({ error: 'Invalid category' });
     }
-    
+
     // Get scheme information
     const schemeInfo = await getGovernmentSchemeInfo(category, description || '');
-    
+
     res.json(schemeInfo);
   } catch (error) {
     console.error('Error getting scheme information:', error);

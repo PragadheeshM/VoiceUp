@@ -30,6 +30,12 @@
                     </span>
                 </div>
                 <div class="meta-item">
+                    <span class="meta-label">Tracking ID:</span>
+                    <span class="meta-value tracking-id">
+                        <%= complaint.trackingId %>
+                    </span>
+                </div>
+                <div class="meta-item">
                     <span class="meta-label">Priority:</span>
                     <span class="meta-value priority-badge <%= complaint.priority %>">
                         <% if (complaint.priority==='low' ) { %>
@@ -86,7 +92,7 @@
             </div>
             <% } %>
 
-                <% if (locals.user && (locals.user.role==='ADMIN' || locals.user.role==='OFFICER')) { %>
+                <% if (locals.user && (locals.user.role==='ADMIN' || locals.user.role==='OFFICER' )) { %>
                     <div class="update-section">
                         <h2 class="section-title">Update Complaint Status</h2>
                         <form action="/update-complaint-status" method="POST" class="update-form">
@@ -368,5 +374,15 @@
                 .section-title {
                     font-size: 1.2rem;
                 }
+            }
+
+            .tracking-id {
+                font-family: monospace;
+                font-weight: bold;
+                color: #2c3e50;
+                background-color: #f8f9fa;
+                padding: 0.2rem 0.5rem;
+                border-radius: 4px;
+                border: 1px solid #dee2e6;
             }
         </style>

@@ -17,16 +17,23 @@
                     </ul>
                     <p>How can I assist you today?</p>
                     <div class="suggested-questions">
-                        <button class="suggestion-btn" data-question="How do I file a complaint?">How do I file a complaint?</button>
-                        <button class="suggestion-btn" data-question="Which department should I contact for road repairs?">Which department for road repairs?</button>
-                        <button class="suggestion-btn" data-question="What is PM Awas Yojana?">What is PM Awas Yojana?</button>
-                        <button class="suggestion-btn" data-question="How can I track my complaint status?">How to track my complaint?</button>
-                        <button class="suggestion-btn" data-question="Tell me about government schemes for healthcare">Healthcare schemes</button>
+                        <button class="suggestion-btn" data-question="How do I file a complaint?">How do I file a
+                            complaint?</button>
+                        <button class="suggestion-btn"
+                            data-question="Which department should I contact for road repairs?">Which department for
+                            road repairs?</button>
+                        <button class="suggestion-btn" data-question="What is PM Awas Yojana?">What is PM Awas
+                            Yojana?</button>
+                        <button class="suggestion-btn" data-question="How can I track my complaint status?">How to track
+                            my complaint?</button>
+                        <button class="suggestion-btn"
+                            data-question="Tell me about government schemes for healthcare">Healthcare schemes</button>
                     </div>
                 </div>
             </div>
             <div class="chat-input">
-                <input type="text" id="user-input" placeholder="Ask about filing a complaint, government schemes, or tracking grievances...">
+                <input type="text" id="user-input"
+                    placeholder="Ask about filing a complaint, government schemes, or tracking grievances...">
                 <button id="send-button">Send</button>
             </div>
             <div class="typing-indicator" id="typing-indicator">
@@ -104,14 +111,9 @@
                             <div class="tracking-form">
                                 <form action="/track-status" method="POST" class="status-form">
                                     <div class="form-group">
-                                        <label for="applicationId">Application ID</label>
-                                        <input type="text" id="applicationId" name="applicationId"
-                                            placeholder="Enter your application ID" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="email">Email Address</label>
-                                        <input type="email" id="email" name="email"
-                                            placeholder="Enter your registered email" required>
+                                        <label for="trackingId">Tracking ID</label>
+                                        <input type="text" id="trackingId" name="trackingId"
+                                            placeholder="Enter your complaint tracking ID" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Track Status</button>
                                 </form>
@@ -215,7 +217,8 @@
 
                 <section class="help-section">
                     <h2 class="help-title">Need Assistance?</h2>
-                    <p class="help-description">Our support team is available to help you file and track your complaints.</p>
+                    <p class="help-description">Our support team is available to help you file and track your
+                        complaints.</p>
                     <div class="support-options">
                         <div class="support-option">
                             <span class="option-icon">📧</span>
@@ -1049,17 +1052,17 @@
                     try {
                         // Check if the message is asking about government schemes
                         const schemeKeywords = ['scheme', 'program', 'yojana', 'mission', 'initiative'];
-                        const isSchemeQuery = schemeKeywords.some(keyword => 
+                        const isSchemeQuery = schemeKeywords.some(keyword =>
                             message.toLowerCase().includes(keyword.toLowerCase())
                         );
-                        
+
                         let response;
-                        
+
                         if (isSchemeQuery) {
                             // Extract category from the message if possible
                             const categories = ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION', 'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION'];
                             let category = 'OTHER';
-                            
+
                             for (const cat of categories) {
                                 const catLower = cat.toLowerCase().replace('_', ' ');
                                 if (message.toLowerCase().includes(catLower)) {
@@ -1067,15 +1070,15 @@
                                     break;
                                 }
                             }
-                            
+
                             // Fetch scheme information
                             const schemeResponse = await fetch(`/api/schemes/${category}?description=${encodeURIComponent(message)}`);
                             const schemeData = await schemeResponse.json();
-                            
+
                             if (schemeResponse.ok && schemeData.schemes && schemeData.schemes.length > 0) {
                                 // Format scheme information for display
                                 let schemeText = `Here are some government schemes that might help you:\n\n`;
-                                
+
                                 schemeData.schemes.forEach(scheme => {
                                     schemeText += `**${scheme.name}**\n`;
                                     schemeText += `${scheme.description}\n`;
@@ -1085,14 +1088,14 @@
                                     }
                                     schemeText += '\n';
                                 });
-                                
+
                                 // Hide typing indicator before showing response
                                 typingIndicator.classList.remove('active');
                                 addMessage(schemeText, false);
                                 return;
                             }
                         }
-                        
+
                         // If not a scheme query or scheme fetch failed, use the regular chat API
                         response = await fetch('/api/chat', {
                             method: 'POST',

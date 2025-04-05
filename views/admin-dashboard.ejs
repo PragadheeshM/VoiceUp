@@ -13,36 +13,46 @@
                     <div class="stat-content">
                         <div class="stat-icon">👮</div>
                         <div class="stat-info">
-                            <div class="stat-value"><%= officers.length %></div>
+                            <div class="stat-value">
+                                <%= officers.length %>
+                            </div>
                             <div class="stat-label">Officers</div>
                         </div>
                     </div>
                     <div class="stat-progress">
-                        <div class="progress-bar" style="width: <%= (officers.length / (officers.length + citizens.length)) * 100 %>%"></div>
+                        <div class="progress-bar"
+                            style="width: <%= (officers.length / (officers.length + citizens.length)) * 100 %>%"></div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-content">
                         <div class="stat-icon">👥</div>
                         <div class="stat-info">
-                            <div class="stat-value"><%= citizens.length %></div>
+                            <div class="stat-value">
+                                <%= citizens.length %>
+                            </div>
                             <div class="stat-label">Citizens</div>
                         </div>
                     </div>
                     <div class="stat-progress">
-                        <div class="progress-bar" style="width: <%= (citizens.length / (officers.length + citizens.length)) * 100 %>%"></div>
+                        <div class="progress-bar"
+                            style="width: <%= (citizens.length / (officers.length + citizens.length)) * 100 %>%"></div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-content">
                         <div class="stat-icon">📝</div>
                         <div class="stat-info">
-                            <div class="stat-value"><%= complaints.length %></div>
+                            <div class="stat-value">
+                                <%= complaints.length %>
+                            </div>
                             <div class="stat-label">Total Complaints</div>
                         </div>
                     </div>
                     <div class="stat-progress">
-                        <div class="progress-bar" style="width: <%= Math.min((complaints.length / (officers.length + citizens.length)) * 100, 100) %>%"></div>
+                        <div class="progress-bar"
+                            style="width: <%= Math.min((complaints.length / (officers.length + citizens.length)) * 100, 100) %>%">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,7 +80,7 @@
                                     data-status="<%= complaint.status %>">
                                     <div class="complaint-header">
                                         <div class="category-badge">
-                                            <%= complaint.category.replace('_', ' ') %>
+                                            <%= complaint.category.replace('_', ' ' ) %>
                                         </div>
                                         <div class="status-badge <%= complaint.status.toLowerCase() %>">
                                             <%= complaint.status %>
@@ -101,13 +111,19 @@
                                         <form action="/update-complaint-status" method="POST" class="status-form">
                                             <input type="hidden" name="complaintId" value="<%= complaint._id %>">
                                             <select name="status" class="status-select">
-                                                <option value="PENDING" <%= complaint.status === 'PENDING' ? 'selected' : '' %>>Pending</option>
-                                                <option value="IN_PROGRESS" <%= complaint.status === 'IN_PROGRESS' ? 'selected' : '' %>>In Progress</option>
-                                                <option value="RESOLVED" <%= complaint.status === 'RESOLVED' ? 'selected' : '' %>>Resolved</option>
+                                                <option value="PENDING" <%=complaint.status==='PENDING' ? 'selected'
+                                                    : '' %>>Pending</option>
+                                                <option value="PROCESSING" <%=complaint.status==='PROCESSING'
+                                                    ? 'selected' : '' %>>Processing</option>
+                                                <option value="RESOLVED" <%=complaint.status==='RESOLVED' ? 'selected'
+                                                    : '' %>>Resolved</option>
+                                                <option value="REJECTED" <%=complaint.status==='REJECTED' ? 'selected'
+                                                    : '' %>>Rejected</option>
                                             </select>
                                             <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
                                         </form>
-                                        <a href="/complaint/<%= complaint._id %>" class="btn btn-secondary btn-sm">View Details</a>
+                                        <a href="/complaint/<%= complaint._id %>" class="btn btn-secondary btn-sm">View
+                                            Details</a>
                                     </div>
                                 </div>
                                 <% }); %>
@@ -502,6 +518,7 @@
                     transform: translateY(-10px);
                     opacity: 0;
                 }
+
                 to {
                     transform: translateY(0);
                     opacity: 1;
@@ -511,11 +528,11 @@
 
         <%- contentFor('script') %>
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
                     // Handle status update form submissions
                     const statusForms = document.querySelectorAll('.status-form');
                     statusForms.forEach(form => {
-                        form.addEventListener('submit', function(e) {
+                        form.addEventListener('submit', function (e) {
                             // Let the form submit normally
                             // The server will handle the redirect
                         });
