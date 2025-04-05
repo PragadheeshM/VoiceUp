@@ -8,6 +8,7 @@ const usermodel = require('./model/user');
 const postmodel = require("./model/post")
 const { Municipality, Police, Electricity, RTO } = require('./model/departments');
 const { categorizeComplaint, getGovernmentSchemeInfo } = require('./utils/categorizer');
+const { sendStatusUpdateEmail } = require('./utils/email');
 const cookieParser = require('cookie-parser');
 const { verify } = require('crypto');
 const mongoose = require('mongoose');
@@ -703,10 +704,14 @@ app.post('/update-complaint-status', isLoggedIn, isOfficer, async (req, res) => 
       return res.status(400).json({ error: 'Complaint ID and status are required' });
     }
 
+    // First find the complaint
     const complaint = await Complaint.findById(complaintId);
     if (!complaint) {
       return res.status(404).json({ error: 'Complaint not found' });
     }
+
+    // Store the old status before updating
+    const oldStatus = complaint.status;
 
     // Update status and last updated timestamp
     complaint.status = status;
@@ -714,11 +719,49 @@ app.post('/update-complaint-status', isLoggedIn, isOfficer, async (req, res) => 
 
     await complaint.save();
 
-    // Redirect back to the admin dashboard
-    res.redirect('/admin');
+    // Find the user to get their email
+    try {
+      const user = await usermodel.findById(complaint.userId);
+      if (user && user.email) {
+        console.log('Found user email:', user.email);
+        console.log('Sending email with details:', {
+          trackingId: complaint.trackingId,
+          oldStatus,
+          newStatus: status
+        });
+
+        await sendStatusUpdateEmail(
+          user.email,
+          complaint.trackingId,
+          oldStatus,
+          status
+        );
+        console.log('Status update email sent successfully to:', user.email);
+      } else {
+        console.log('User or email not found for complaint:', complaintId);
+      }
+    } catch (emailError) {
+      console.error('Error sending status update email:', emailError);
+      // Continue with the response even if email fails
+    }
+
+    // Send success response for AJAX requests
+    if (req.xhr || req.headers.accept.includes('application/json')) {
+      return res.json({ 
+        success: true, 
+        message: 'Complaint status updated successfully',
+        complaint: complaint 
+      });
+    }
+
+    // Redirect back to the complaint details page for regular form submissions
+    res.redirect(`/complaint/${complaintId}`);
   } catch (error) {
     console.error('Error updating complaint status:', error);
-    res.status(500).json({ error: 'Failed to update complaint status' });
+    if (req.xhr || req.headers.accept.includes('application/json')) {
+      return res.status(500).json({ error: 'Failed to update complaint status' });
+    }
+    res.status(500).send('Error updating complaint status');
   }
 });
 
