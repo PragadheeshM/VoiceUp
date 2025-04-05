@@ -6,11 +6,19 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const usermodel = require('./model/user');
 const postmodel = require("./model/post")
+const { Municipality, Police, Electricity, RTO } = require('./model/departments');
+const { categorizeComplaint } = require('./utils/categorizer');
 const cookieParser = require('cookie-parser');
 const { verify } = require('crypto');
 const mongoose = require('mongoose');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+
+// Validate environment variables
+if (!process.env.GEMINI_API_KEY) {
+  console.error('Error: GEMINI_API_KEY is not set in .env file');
+  process.exit(1);
+}
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -239,12 +247,12 @@ app.get("/profile/:username", isLoggedIn, async (req, res) => {
 
     // Get the logged-in user's full information
     const loggedInUser = await usermodel.findById(req.user.userId);
-    
+
     let blogg = await postmodel.find();
-    res.render('profile', { 
-      title: 'Profile', 
-      user, 
-      blogg, 
+    res.render('profile', {
+      title: 'Profile',
+      user,
+      blogg,
       displaydata,
       loggedInUser,
       isOwnProfile: loggedInUser._id.toString() === user._id.toString(),
@@ -428,40 +436,117 @@ app.get('/complaints', isLoggedIn, (req, res) => {
   });
 });
 
-app.post('/complaints', isLoggedIn, async (req, res) => {
+app.post('/complaints', async (req, res) => {
   try {
-    const { title, description, category, location } = req.body;
+    const { title, description, location } = req.body;
+    const userId = req.user ? req.user._id : null;
 
-    // Create new complaint
-    const newComplaint = await Complaint.create({
-      title,
-      description,
-      category,
-      location,
-      priority: 'low', // Default to low priority since we removed the selection
-      userId: req.user.userId,
-      status: 'PENDING'
-    });
+    if (!description) {
+      return res.render('file-complaint', {
+        title: 'File a Complaint',
+        error: 'Description is required for AI categorization',
+        categories: ['MUNICIPALITY', 'POLICE', 'ELECTRICITY', 'RTO']
+      });
+    }
 
-    res.redirect('/my-complaints');
-  } catch (error) {
-    console.error('Error filing complaint:', error);
+    // Use AI to categorize the complaint
+    const category = await categorizeComplaint(description);
+
+    // Create complaint based on category
+    let complaint;
+    switch (category) {
+      case 'MUNICIPALITY':
+        complaint = new Municipality({
+          title,
+          description,
+          location,
+          userId,
+          status: 'PENDING',
+          priority: 'MEDIUM'
+        });
+        break;
+      case 'POLICE':
+        complaint = new Police({
+          title,
+          description,
+          location,
+          userId,
+          status: 'PENDING',
+          priority: 'MEDIUM'
+        });
+        break;
+      case 'ELECTRICITY':
+        complaint = new Electricity({
+          title,
+          description,
+          location,
+          userId,
+          status: 'PENDING',
+          priority: 'MEDIUM'
+        });
+        break;
+      case 'RTO':
+        complaint = new RTO({
+          title,
+          description,
+          location,
+          userId,
+          status: 'PENDING',
+          priority: 'MEDIUM'
+        });
+        break;
+      default:
+        throw new Error('Invalid category');
+    }
+
+    await complaint.save();
+
+    // Redirect with success message
     res.render('file-complaint', {
       title: 'File a Complaint',
-      categories: ['INFRASTRUCTURE', 'WATER_SUPPLY', 'ELECTRICITY', 'SANITATION',
-        'HEALTHCARE', 'EDUCATION', 'TRANSPORTATION', 'OTHER'],
-      error: 'Error filing complaint. Please try again.'
+      success: 'Complaint submitted successfully and categorized by AI'
+    });
+  } catch (error) {
+    console.error('Error submitting complaint:', error);
+    res.render('file-complaint', {
+      title: 'File a Complaint',
+      error: 'Failed to submit complaint. Please try again. Error: ' + error.message,
+      categories: ['MUNICIPALITY', 'POLICE', 'ELECTRICITY', 'RTO']
     });
   }
 });
 
 app.get('/my-complaints', isLoggedIn, async (req, res) => {
   try {
-    const complaints = await Complaint.find({ userId: req.user.userId }).sort({ createdAt: -1 });
-    res.render('my-complaints', { title: 'My Complaints', complaints });
+    // Fetch complaints from all departments
+    const [municipalityComplaints, policeComplaints, electricityComplaints, rtoComplaints] = await Promise.all([
+      Municipality.find({ userId: req.user._id }).sort({ createdAt: -1 }),
+      Police.find({ userId: req.user._id }).sort({ createdAt: -1 }),
+      Electricity.find({ userId: req.user._id }).sort({ createdAt: -1 }),
+      RTO.find({ userId: req.user._id }).sort({ createdAt: -1 })
+    ]);
+
+    // Combine all complaints and add department type
+    const allComplaints = [
+      ...municipalityComplaints.map(c => ({ ...c.toObject(), department: 'Municipality' })),
+      ...policeComplaints.map(c => ({ ...c.toObject(), department: 'Police' })),
+      ...electricityComplaints.map(c => ({ ...c.toObject(), department: 'Electricity' })),
+      ...rtoComplaints.map(c => ({ ...c.toObject(), department: 'RTO' }))
+    ];
+
+    // Sort all complaints by creation date
+    allComplaints.sort((a, b) => b.createdAt - a.createdAt);
+
+    res.render('my-complaints', {
+      title: 'My Complaints',
+      complaints: allComplaints
+    });
   } catch (error) {
     console.error('Error fetching complaints:', error);
-    res.status(500).send('Error loading complaints');
+    res.status(500).render('my-complaints', {
+      title: 'My Complaints',
+      error: 'Error loading complaints. Please try again later.'
+    });
   }
 });
 
@@ -489,11 +574,35 @@ app.get('/complaint/:id', isLoggedIn, async (req, res) => {
 // Admin dashboard for complaints
 app.get('/admin-complaints', isLoggedIn, isOfficer, async (req, res) => {
   try {
-    const complaints = await Complaint.find().sort({ createdAt: -1 });
-    res.render('admin-complaints', { title: 'Manage Complaints', complaints });
+    // Fetch complaints from all departments
+    const [municipalityComplaints, policeComplaints, electricityComplaints, rtoComplaints] = await Promise.all([
+      Municipality.find().sort({ createdAt: -1 }),
+      Police.find().sort({ createdAt: -1 }),
+      Electricity.find().sort({ createdAt: -1 }),
+      RTO.find().sort({ createdAt: -1 })
+    ]);
+
+    // Combine all complaints and add department type
+    const allComplaints = [
+      ...municipalityComplaints.map(c => ({ ...c.toObject(), department: 'Municipality' })),
+      ...policeComplaints.map(c => ({ ...c.toObject(), department: 'Police' })),
+      ...electricityComplaints.map(c => ({ ...c.toObject(), department: 'Electricity' })),
+      ...rtoComplaints.map(c => ({ ...c.toObject(), department: 'RTO' }))
+    ];
+
+    // Sort all complaints by creation date
+    allComplaints.sort((a, b) => b.createdAt - a.createdAt);
+
+    res.render('admin-complaints', {
+      title: 'Manage Complaints',
+      complaints: allComplaints
+    });
   } catch (error) {
     console.error('Error fetching complaints for admin:', error);
-    res.status(500).send('Error loading complaints');
+    res.status(500).render('admin-complaints', {
+      title: 'Manage Complaints',
+      error: 'Error loading complaints. Please try again later.'
+    });
   }
 });
 
@@ -533,60 +642,37 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
     const officers = await usermodel.find({ role: 'OFFICER' });
     const citizens = await usermodel.find({ role: 'CITIZEN' });
 
-    // Get actual complaints data
-    let complaints = await Complaint.find().sort({ createdAt: -1 }).limit(5);
+    // Fetch complaints from all departments
+    const [municipalityComplaints, policeComplaints, electricityComplaints, rtoComplaints] = await Promise.all([
+      Municipality.find().sort({ createdAt: -1 }),
+      Police.find().sort({ createdAt: -1 }),
+      Electricity.find().sort({ createdAt: -1 }),
+      RTO.find().sort({ createdAt: -1 })
+    ]);
 
-    // If no complaints exist yet, use sample data with all necessary fields
-    if (complaints.length === 0) {
-      complaints = [
-        {
-          _id: '1',
-          title: 'Road Repair Request',
-          status: 'PENDING',
-          createdAt: new Date(),
-          category: 'INFRASTRUCTURE',
-          priority: 'medium',
-          location: 'Main Street'
-        },
-        {
-          _id: '2',
-          title: 'Water Supply Issue',
-          status: 'PROCESSING',
-          createdAt: new Date(Date.now() - 86400000), // 1 day ago
-          category: 'WATER_SUPPLY',
-          priority: 'high',
-          location: 'North District'
-        },
-        {
-          _id: '3',
-          title: 'Garbage Collection',
-          status: 'RESOLVED',
-          createdAt: new Date(Date.now() - 172800000), // 2 days ago
-          category: 'SANITATION',
-          priority: 'low',
-          location: 'South District'
-        },
-        {
-          _id: '4',
-          title: 'Street Light Repair',
-          status: 'REJECTED',
-          createdAt: new Date(Date.now() - 259200000), // 3 days ago
-          category: 'ELECTRICITY',
-          priority: 'medium',
-          location: 'East District'
-        }
-      ];
-    }
+    // Combine all complaints and add department type
+    const allComplaints = [
+      ...municipalityComplaints.map(c => ({ ...c.toObject(), department: 'Municipality' })),
+      ...policeComplaints.map(c => ({ ...c.toObject(), department: 'Police' })),
+      ...electricityComplaints.map(c => ({ ...c.toObject(), department: 'Electricity' })),
+      ...rtoComplaints.map(c => ({ ...c.toObject(), department: 'RTO' }))
+    ];
+
+    // Sort all complaints by creation date
+    allComplaints.sort((a, b) => b.createdAt - a.createdAt);
 
     res.render('admin-dashboard', {
       title: 'Admin Dashboard',
       officers,
       citizens,
-      complaints
+      complaints: allComplaints
     });
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).send('Error loading admin dashboard');
+    console.error('Error fetching admin dashboard data:', error);
+    res.status(500).render('admin-dashboard', {
+      title: 'Admin Dashboard',
+      error: 'Error loading dashboard data. Please try again later.'
+    });
   }
 });
 

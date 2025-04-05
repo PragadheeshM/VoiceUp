@@ -3,7 +3,8 @@
         <div class="complaint-hero">
             <div class="complaint-hero-content">
                 <h1 class="hero-title">File a Complaint</h1>
-                <p class="hero-subtitle">Submit your concerns to the appropriate government department</p>
+                <p class="hero-subtitle">Submit your concerns and our AI will automatically route it to the appropriate
+                    department</p>
             </div>
         </div>
 
@@ -16,89 +17,90 @@
             </div>
             <% } %>
 
-                <div class="complaint-card">
-                    <div class="complaint-card-header">
-                        <div class="card-icon">📄</div>
-                        <h2 class="card-title">Complaint Form</h2>
+                <% if (locals.success) { %>
+                    <div class="alert alert-success">
+                        <div class="alert-icon">✅</div>
+                        <div class="alert-content">
+                            <%= success %>
+                        </div>
                     </div>
+                    <% } %>
 
-                    <form action="/complaints" method="POST" class="complaint-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="title" class="form-label">Complaint Title</label>
-                                <input type="text" id="title" name="title" class="form-input"
-                                    placeholder="Enter a brief title for your complaint" required>
+                        <div class="complaint-card">
+                            <div class="complaint-card-header">
+                                <div class="card-icon">🤖</div>
+                                <h2 class="card-title">AI-Powered Complaint Form</h2>
                             </div>
 
-                            <div class="form-group">
-                                <label for="category" class="form-label">Category</label>
-                                <div class="custom-select">
-                                    <select id="category" name="category" class="form-input" required>
-                                        <option value="" disabled selected>Select a category</option>
-                                        <% categories.forEach(category=> { %>
-                                            <option value="<%= category %>">
-                                                <%= category.replace('_', ' ' ) %>
-                                            </option>
-                                            <% }) %>
-                                    </select>
-                                    <div class="select-arrow">▼</div>
+                            <form action="/complaints" method="POST" class="complaint-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="title" class="form-label">Complaint Title</label>
+                                        <input type="text" id="title" name="title" class="form-input"
+                                            placeholder="Enter a brief title for your complaint" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="location" class="form-label">Location</label>
+                                        <input type="text" id="location" name="location" class="form-input"
+                                            placeholder="Enter the location related to this complaint" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea id="description" name="description" class="form-input form-textarea"
+                                        placeholder="Provide detailed information about your complaint. Our AI will analyze your description and automatically route it to the appropriate department:
+                        
+- Municipality: For issues related to roads, garbage, water supply, drainage, public spaces
+- Police: For issues related to law enforcement, public safety, traffic violations
+- Electricity: For issues related to power supply, street lights, electrical infrastructure
+- RTO: For issues related to vehicle registration, driving licenses, traffic management" rows="5" required></textarea>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="btn-icon">🤖</span>
+                                        Submit with AI Categorization
+                                    </button>
+                                    <a href="/" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="process-steps">
+                            <h3 class="steps-title">How AI Categorization Works</h3>
+                            <div class="steps-container">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>Submit</h4>
+                                        <p>Enter your complaint details</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>Analyze</h4>
+                                        <p>AI analyzes your complaint content</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>Categorize</h4>
+                                        <p>AI determines the appropriate department</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h4>Route</h4>
+                                        <p>Complaint is sent to the right department</p>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="location" class="form-label">Location</label>
-                                <input type="text" id="location" name="location" class="form-input"
-                                    placeholder="Enter the location related to this complaint" required>
-                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea id="description" name="description" class="form-input form-textarea"
-                                placeholder="Provide detailed information about your complaint" rows="5"
-                                required></textarea>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Submit Complaint</button>
-                            <a href="/" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="process-steps">
-                    <h3 class="steps-title">Complaint Processing Procedure</h3>
-                    <div class="steps-container">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>Submission</h4>
-                                <p>Your complaint is logged in our system</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>Review</h4>
-                                <p>Officials evaluate your complaint</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>Processing</h4>
-                                <p>You'll receive updates on progress</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>Resolution</h4>
-                                <p>Your issue is addressed and closed</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
     </div>
 
     <%- contentFor('style') %>
@@ -403,5 +405,19 @@
                 font-weight: 600;
                 color: #73003b;
                 margin: 0 0 1rem;
+            }
+
+            .btn-icon {
+                margin-right: 8px;
+            }
+
+            .alert-success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .alert-success .alert-icon {
+                color: #28a745;
             }
         </style>
