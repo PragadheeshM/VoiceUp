@@ -18,7 +18,6 @@
             <nav class="navbar-links">
                 <a href="/">Home</a>
                 <% if (!locals.user || locals.user.role !== 'ADMIN') { %>
-                    <a href="/services">Services</a>
                     <a href="/complaints">Complaints</a>
                 <% } %>
                 <a href="/currentStatus">Current Status</a>

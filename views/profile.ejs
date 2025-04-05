@@ -87,6 +87,7 @@
                 </div>
             </div>
 
+            <% if (isOwnProfile || isAdmin) { %>
             <div class="profile-card">
                 <h2 class="card-title">Account Actions</h2>
                 <div class="profile-actions">
@@ -94,6 +95,7 @@
                     <button class="btn btn-danger" onclick="showDeleteConfirmation()">Delete Account</button>
                 </div>
             </div>
+            <% } %>
         </div>
 
         <!-- Update Profile Form (Hidden by default) -->

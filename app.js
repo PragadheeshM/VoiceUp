@@ -237,8 +237,19 @@ app.get("/profile/:username", isLoggedIn, async (req, res) => {
       return res.redirect(`/profile/${req.user.username}`);
     }
 
+    // Get the logged-in user's full information
+    const loggedInUser = await usermodel.findById(req.user.userId);
+    
     let blogg = await postmodel.find();
-    res.render('profile', { title: 'Profile', user, blogg, displaydata });
+    res.render('profile', { 
+      title: 'Profile', 
+      user, 
+      blogg, 
+      displaydata,
+      loggedInUser,
+      isOwnProfile: loggedInUser._id.toString() === user._id.toString(),
+      isAdmin: loggedInUser.role === 'ADMIN'
+    });
   } catch (error) {
     console.error('Error loading profile:', error);
     res.redirect('/');
@@ -405,10 +416,6 @@ app.get('/login', (req, res) => {
 app.get('/currentStatus', (req, res) => {
   // Pass an empty applications array for now
   res.render('currentStatus', { title: 'Application Status', applications: [] });
-});
-
-app.get('/services', (req, res) => {
-  res.render('services', { title: 'Services' });
 });
 
 // Complaints routes

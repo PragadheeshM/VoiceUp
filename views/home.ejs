@@ -32,7 +32,7 @@
 
                 <div class="hero-actions">
                     <% if (locals.user) { %>
-                        <a href="/services" class="btn btn-primary">Access Services</a>
+                        <a href="/complaints" class="btn btn-primary">File a Complaint</a>
                         <a href="/currentStatus" class="btn btn-secondary">Check Status</a>
                         <% } else { %>
                             <a href="/login" class="btn btn-primary">Login</a>
@@ -161,6 +161,62 @@
                                 <span class="stat-number">Fast</span>
                                 <span class="stat-label">Processing</span>
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="process-section">
+                    <h2 class="process-title">Complaint Processing Procedure</h2>
+                    <div class="steps-container">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Submission</h4>
+                                <p>Your complaint is logged in our system</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Review</h4>
+                                <p>Officials verify and categorize your complaint</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Processing</h4>
+                                <p>Your complaint is assigned to the appropriate department</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Resolution</h4>
+                                <p>Your issue is addressed and closed</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="help-section">
+                    <h2 class="help-title">Need Assistance?</h2>
+                    <p class="help-description">Our support team is available to help you file and track your complaints.</p>
+                    <div class="support-options">
+                        <div class="support-option">
+                            <span class="option-icon">📧</span>
+                            <h3 class="option-title">Email Support</h3>
+                            <p class="option-detail">support@government-portal.gov</p>
+                        </div>
+                        <div class="support-option">
+                            <span class="option-icon">📞</span>
+                            <h3 class="option-title">Phone Support</h3>
+                            <p class="option-detail">1-800-GOV-HELP</p>
+                        </div>
+                        <div class="support-option">
+                            <span class="option-icon">💬</span>
+                            <h3 class="option-title">Live Chat</h3>
+                            <p class="option-detail">Available 9 AM - 5 PM</p>
                         </div>
                     </div>
                 </section>
@@ -524,10 +580,9 @@
             }
 
             .info-stats {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 2rem;
-                margin-top: 3rem;
+                display: flex;
+                justify-content: space-around;
+                margin-top: 2rem;
             }
 
             .stat-item {
@@ -751,6 +806,156 @@
 
                 50% {
                     transform: translateY(-5px);
+                }
+            }
+
+            /* Process Section Styles */
+            .process-section {
+                background-color: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--card-shadow);
+                padding: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            .process-title {
+                text-align: center;
+                margin-bottom: 2rem;
+                font-size: 1.8rem;
+                color: var(--text-color);
+                font-weight: 600;
+            }
+
+            .steps-container {
+                display: flex;
+                gap: 1rem;
+                justify-content: space-between;
+                position: relative;
+            }
+
+            .steps-container:before {
+                content: "";
+                position: absolute;
+                top: 25px;
+                left: 50px;
+                right: 50px;
+                height: 2px;
+                background: #eaeaea;
+                z-index: 0;
+            }
+
+            .step {
+                flex: 1;
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .step-number {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: var(--primary-color);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin: 0 auto 1rem;
+            }
+
+            .step-content h4 {
+                margin: 0 0 0.5rem;
+                color: var(--text-color);
+                font-size: 1rem;
+            }
+
+            .step-content p {
+                color: var(--text-muted);
+                font-size: 0.9rem;
+                margin: 0;
+            }
+
+            /* Help Section Styles */
+            .help-section {
+                background-color: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--card-shadow);
+                padding: 2rem;
+                margin-bottom: 3rem;
+            }
+
+            .help-title {
+                text-align: center;
+                margin-bottom: 1rem;
+                font-size: 1.8rem;
+                color: var(--text-color);
+                font-weight: 600;
+            }
+
+            .help-description {
+                text-align: center;
+                color: var(--text-muted);
+                margin-bottom: 2rem;
+            }
+
+            .support-options {
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 1.5rem;
+            }
+
+            .support-option {
+                text-align: center;
+                flex: 1;
+                min-width: 200px;
+                padding: 1.5rem;
+                background: #f8f9fa;
+                border-radius: var(--border-radius);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .support-option:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .option-icon {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+                display: block;
+            }
+
+            .option-title {
+                margin: 0 0 0.5rem;
+                color: var(--text-color);
+                font-size: 1.1rem;
+            }
+
+            .option-detail {
+                color: var(--text-muted);
+                font-size: 0.9rem;
+                margin: 0;
+            }
+
+            @media (max-width: 768px) {
+                .steps-container {
+                    flex-direction: column;
+                    gap: 2rem;
+                }
+
+                .steps-container:before {
+                    display: none;
+                }
+
+                .support-options {
+                    flex-direction: column;
+                }
+
+                .support-option {
+                    width: 100%;
                 }
             }
         </style>
