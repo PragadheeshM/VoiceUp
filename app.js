@@ -9,6 +9,11 @@ const postmodel = require("./model/post")
 const cookieParser = require('cookie-parser');
 const { verify } = require('crypto');
 const mongoose = require('mongoose');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config();
+
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Define Complaint model schema if it doesn't exist yet
 const complaintSchema = new mongoose.Schema({
@@ -206,7 +211,7 @@ app.get("/profile", isLoggedIn, async (req, res) => {
       return res.redirect('/');
     }
   }
-  
+
   // Redirect to the username-based profile URL
   res.redirect(`/profile/${req.user.username}`);
 })
@@ -216,7 +221,7 @@ app.get("/profile/:username", isLoggedIn, async (req, res) => {
   try {
     let displaydata = await usermodel.find();
     let user = await usermodel.findOne({ username: req.params.username }).populate("posts");
-    
+
     // If user not found, redirect to the logged-in user's profile
     if (!user) {
       // If username is not in the token, fetch it from the database
@@ -231,7 +236,7 @@ app.get("/profile/:username", isLoggedIn, async (req, res) => {
       }
       return res.redirect(`/profile/${req.user.username}`);
     }
-    
+
     let blogg = await postmodel.find();
     res.render('profile', { title: 'Profile', user, blogg, displaydata });
   } catch (error) {
@@ -332,22 +337,22 @@ function isLoggedIn(req, res, next) {
     if (req.xhr || req.path.includes('/api/')) {
       return res.status(401).json({ error: 'You must be logged in to access this resource' });
     }
-    
+
     // Check if the request is for complaints page specifically
     if (req.path === '/complaints') {
-      return res.render('login', { 
-        title: 'Login', 
-        error: 'Please login first to register a complaint' 
+      return res.render('login', {
+        title: 'Login',
+        error: 'Please login first to register a complaint'
       });
     }
-    
+
     // Generic message for other protected routes
-    return res.render('login', { 
-      title: 'Login', 
-      error: 'You must be logged in to access this resource' 
+    return res.render('login', {
+      title: 'Login',
+      error: 'You must be logged in to access this resource'
     });
   }
-  
+
   try {
     let data = jwt.verify(req.cookies.Token, "shhh");
     req.user = data;
@@ -355,9 +360,9 @@ function isLoggedIn(req, res, next) {
   } catch (error) {
     // JWT verification failed
     res.clearCookie('Token');
-    return res.render('login', { 
-      title: 'Login', 
-      error: 'Your session has expired. Please login again.' 
+    return res.render('login', {
+      title: 'Login',
+      error: 'Your session has expired. Please login again.'
     });
   }
 }
@@ -523,7 +528,7 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
 
     // Get actual complaints data
     let complaints = await Complaint.find().sort({ createdAt: -1 }).limit(5);
-    
+
     // If no complaints exist yet, use sample data with all necessary fields
     if (complaints.length === 0) {
       complaints = [
@@ -629,7 +634,7 @@ app.post('/delete-user/:userId', isLoggedIn, isAdmin, async (req, res) => {
     if (!userToDelete) {
       return res.status(404).send('User not found');
     }
-    
+
     if (userToDelete.role === 'ADMIN') {
       const adminCount = await usermodel.countDocuments({ role: 'ADMIN' });
       if (adminCount <= 1) {
@@ -705,5 +710,40 @@ app.post('/track-status', async (req, res) => {
     });
   }
 });
- 
+
+// Chat API endpoint
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Get the Gemini model with flash-1.5 configuration
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 1024,
+      }
+    });
+
+    // Generate response
+    const result = await model.generateContent(message);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ response: text });
+  } catch (error) {
+    console.error('Error in chat API:', error);
+    res.status(500).json({
+      error: 'An error occurred while processing your request',
+      details: error.message
+    });
+  }
+});
+
 app.listen(3000);
