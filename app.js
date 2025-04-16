@@ -117,7 +117,7 @@ try {
 
 // MongoDB Connection with enhanced error handling
 console.log('Attempting to connect to MongoDB...');
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://hackathon:projectz123@cluster0.wnxeld3.mongodb.net/';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://prasanth6044:11111@voiceup.gebnxpy.mongodb.net/';
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -1127,7 +1127,7 @@ app.get('/assigned-complaints', isLoggedIn, isOfficer, async (req, res) => {
     });
   }
 });
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4001;
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
