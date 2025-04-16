@@ -2,7 +2,7 @@
   --primary-color: #009ab9;
   --secondary-color: #b1fbfa;
   --bg-color: #baf3f6c7;
-  --card-bg: #ffffff65;
+  --card-bg: #f0f5f6f9;
   --text-color: #333333;
   --text-muted: #666666;
   --border-color: #dddddd;
@@ -13,7 +13,7 @@
   --success-bg: rgba(76, 175, 80, 0.1);
   --error-bg: rgba(244, 67, 54, 0.1);
   --warning-bg: rgba(255, 152, 0, 0.1);
-  --info-bg: rgba(33, 150, 243, 0.1);
+  --info-bg: rgba(226, 239, 249, 0.1);
   --input-bg: #ffffff;
   --border-radius: 8px;
   --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -91,7 +91,7 @@ body {
 
 .btn-secondary {
   background-color: var(--secondary-color);
-  color: #333333;
+  color:#3f8d91;
 }
 
 .btn-secondary:hover {

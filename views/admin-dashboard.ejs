@@ -161,6 +161,12 @@
                             <% } %>
                 </div>
     </div>
+    <div class="chart-section">
+        <h2>Complaint Status Distribution</h2>
+        <div class="chart-container">
+            <canvas id="complaintStatusChart" width="400" height="400"></canvas>
+        </div>
+    </div>
 
     <%- contentFor('style') %>
         <style>
@@ -247,6 +253,34 @@
                 border-radius: 2px;
                 overflow: hidden;
             }
+
+            .chart-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .chart-section h2 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .chart-container {
+        position: relative;
+        max-width: 400px;
+        height: 400px;
+        margin: 0 auto;
+    }
+
+    #complaintStatusChart {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
 
             .progress-bar {
                 height: 100%;
@@ -584,16 +618,69 @@
             }
         </style>
 
-        <%- contentFor('script') %>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    // Handle status update form submissions
-                    const statusForms = document.querySelectorAll('.status-form');
-                    statusForms.forEach(form => {
-                        form.addEventListener('submit', function (e) {
-                            // Let the form submit normally
-                            // The server will handle the redirect
-                        });
-                    });
-                });
-            </script>
+<%- contentFor('script') %>
+<script>
+    console.log('Script loaded');
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            // Parse the stringified data
+            const statusData = <%- JSON.stringify(statusData) %>;
+            console.log("Chart Data:", statusData);
+
+            // Get and verify canvas
+            const canvas = document.getElementById('complaintStatusChart');
+            if (!canvas) {
+                console.error("Canvas not found!");
+                return;
+            }
+
+            // Get canvas context
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("Canvas context not available!");
+                return;
+            }
+
+            // Create chart with proper responsive settings
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Pending', 'Processing', 'Resolved', 'Rejected'],
+                    datasets: [{
+                        data: [
+                            statusData.PENDING || 0,
+                            statusData.PROCESSING || 0,
+                            statusData.RESOLVED || 0,
+                            statusData.REJECTED || 0
+                        ],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `${context.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Chart Error:", error);
+        }
+    });
+</script>

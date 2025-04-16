@@ -769,24 +769,40 @@ app.post('/update-complaint-status', isLoggedIn, isOfficer, async (req, res) => 
     res.status(500).send('Error updating complaint status');
   }
 });
-
-// Admin dashboard route
 app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
   try {
     const officers = await usermodel.find({ role: 'OFFICER' });
     const citizens = await usermodel.find({ role: 'CITIZEN' });
-
-    // Fetch all complaints using the main Complaint model
     const complaints = await Complaint.find().sort({ createdAt: -1 });
 
-    // Transform complaints to include category field and populate assigned officer
+    // Aggregate complaint counts by status
+    const statusCounts = await Complaint.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+      { $project: { status: '$_id', count: 1, _id: 0 } }
+    ]);
+
+    // Initialize statusData with default counts
+    const statusData = {
+      PENDING: 0,
+      PROCESSING: 0,
+      RESOLVED: 0,
+      REJECTED: 0
+    };
+
+    // Populate statusData
+    statusCounts.forEach(({ status, count }) => {
+      if (statusData.hasOwnProperty(status)) {
+        statusData[status] = count;
+      }
+    });
+
+    // Log statusData for debugging
+    console.log('Status Data:', statusData);
+
+    // Transform complaints
     const transformedComplaints = await Promise.all(complaints.map(async complaint => {
       const complaintObj = complaint.toObject();
-      
-      // Set default category if not present
       complaintObj.category = complaintObj.category || 'OTHER';
-      
-      // Populate assigned officer if exists
       if (complaintObj.assignedOfficer) {
         const officer = await usermodel.findById(complaintObj.assignedOfficer);
         if (officer) {
@@ -797,7 +813,6 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
           };
         }
       }
-      
       return complaintObj;
     }));
 
@@ -805,13 +820,20 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
       title: 'Admin Dashboard',
       officers,
       citizens,
-      complaints: transformedComplaints
+      complaints: transformedComplaints,
+      statusData,
+      layout: 'layout' // Explicitly set layout
     });
   } catch (error) {
     console.error('Error fetching admin dashboard data:', error);
     res.status(500).render('admin-dashboard', {
       title: 'Admin Dashboard',
-      error: 'Error loading dashboard data. Please try again later.'
+      error: 'Error loading dashboard data. Please try again later.',
+      officers: [],
+      citizens: [],
+      complaints: [],
+      statusData: { PENDING: 0, PROCESSING: 0, RESOLVED: 0, REJECTED: 0 },
+      layout: 'layout'
     });
   }
 });
