@@ -3,7 +3,6 @@ const expressLayouts = require('express-ejs-layouts');
 const app = express();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const path = require('path');
 const usermodel = require('./model/user');
 const postmodel = require("./model/post")
 const { Municipality, Police, Electricity, RTO } = require('./model/departments');
@@ -14,6 +13,9 @@ const { verify } = require('crypto');
 const mongoose = require('mongoose');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+
+const path = require('path');
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Validate environment variables
 if (!process.env.GEMINI_API_KEY) {
@@ -115,7 +117,7 @@ try {
 
 // MongoDB Connection with enhanced error handling
 console.log('Attempting to connect to MongoDB...');
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Data-Association';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://hackathon:projectz123@cluster0.wnxeld3.mongodb.net/';
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -159,20 +161,20 @@ async function createDefaultAdmin() {
     if (!adminExists) {
       // Create default admin account
       const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash('admin123', salt);
+      const hash = await bcrypt.hash('admin1234', salt);
 
       await usermodel.create({
         username: 'admin',
         name: 'Administrator',
         age: 30,
-        email: 'admin@example.com',
+        email: 'admin1@example.com',
         password: hash,
         role: 'ADMIN'
       });
 
       console.log('Default admin account created successfully');
-      console.log('Email: admin@example.com');
-      console.log('Password: admin123');
+      console.log('Email: admin1@example.com');
+      console.log('Password: admin1234');
     } else {
       console.log('Admin account already exists');
     }
@@ -1125,5 +1127,12 @@ app.get('/assigned-complaints', isLoggedIn, isOfficer, async (req, res) => {
     });
   }
 });
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+
 
 module.exports = app;

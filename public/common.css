@@ -1,8 +1,8 @@
 :root {
-  --primary-color: #73003b;
-  --secondary-color: #ffcc00;
-  --bg-color: #f5f5f5;
-  --card-bg: #ffffff;
+  --primary-color: #009ab9;
+  --secondary-color: #b1fbfa;
+  --bg-color: #baf3f6c7;
+  --card-bg: #ffffff65;
   --text-color: #333333;
   --text-muted: #666666;
   --border-color: #dddddd;
@@ -268,6 +268,14 @@ body {
 .dashboard-card-content {
   color: var(--text-color);
 }
+.logo {
+  height: 40px;        /* Adjust size as needed */
+  width: 40px;         /* Make it square for perfect circle */
+  margin-right: 8px;
+  vertical-align: middle;
+  border-radius: 50%;  /* Makes it round */
+  object-fit: cover;   /* Ensures image scales nicely inside the circle */
+}
 
 /* Responsive styles */
 @media (max-width: 768px) {
@@ -290,4 +298,4 @@ body {
     width: 100%;
     justify-content: center;
   }
-} 
+}

@@ -8,7 +8,7 @@
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
-                    <p>Hello! I'm your Government Grievance Assistant. I can help you with:</p>
+                    <p>Hello! I'm your VoiceUp Assistant. I can help you with:</p>
                     <ul class="suggestion-list">
                         <li>Filing complaints</li>
                         <li>Finding the right department</li>
@@ -39,16 +39,17 @@
 
         <button class="chat-toggle" id="chat-toggle">
             <div class="chat-toggle-content">
-                <i class="fas fa-comments"></i>
-                <span class="chat-toggle-text">Need Help?</span>
+                <img src="./images/bot.png" alt="Bot Logo" class="chat-toggle-logo" />
             </div>
             <div class="chat-toggle-pulse"></div>
         </button>
+        
+        
 
         <section class="hero-section">
             <div class="hero-content">
-                <h1 class="hero-title">Welcome to the Government Portal</h1>
-                <p class="hero-subtitle">Your one-stop platform for government services and information</p>
+                <h1 class="hero-title">"A Brave Heart Dares to Question Injustice"</h1>
+                <p class="hero-subtitle">Here is your one-stop platform for government services and information</p>
 
                 <div class="hero-actions">
                     <% if (locals.user) { %>
@@ -829,27 +830,34 @@
                             cursor: pointer;
                         }
 
-                        .chat-toggle {
+                                                .chat-toggle {
                             position: fixed;
                             bottom: 20px;
                             right: 20px;
-                            min-width: 160px;
-                            height: 48px;
+                            width: 56px;
+                            height: 56px;
                             background: #73003b;
-                            color: white;
                             border: none;
-                            border-radius: 24px;
+                            border-radius: 50%;
                             cursor: pointer;
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            font-size: 16px;
                             box-shadow: 0 4px 15px rgba(115, 0, 59, 0.2);
                             z-index: 999;
                             transition: all 0.3s ease;
-                            padding: 0 20px;
+                            padding: 0;
                             overflow: hidden;
                         }
+
+                        .chat-toggle-logo {
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 50%;
+                            object-fit: cover;
+                            pointer-events: none;
+                        }
+
 
                         .chat-toggle-content {
                             display: flex;
@@ -869,6 +877,9 @@
                             transform: translateY(-2px);
                             box-shadow: 0 6px 20px rgba(115, 0, 59, 0.3);
                         }
+                        
+
+
 
                         .chat-toggle-pulse {
                             position: absolute;
