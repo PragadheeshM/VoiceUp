@@ -41,6 +41,8 @@
                     <a href="/create">Sign Up</a>
                 <% } %>
             </nav>
+            <!-- Google Translate Widget -->
+         <div id="google_translate_element" class="navbar-lan"></div>
         </div>
     </header>
 
@@ -55,6 +57,18 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
        <%- typeof script !== 'undefined' ? script : '' %>
+    <!-- Google Translate JS -->
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+            {  pageLanguage: 'en', // Original page language
+        includedLanguages: 'en,ta,hi,te,ml,mr,bn,kn,gu,pa', // Only English, Tamil, Hindi
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE },
+            'google_translate_element'
+        );
+    }
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 
 </html>
