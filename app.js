@@ -38,7 +38,6 @@ async function getGeminiResponse(prompt) {
     return "I apologize, but I'm having trouble processing your request at the moment. Please try again later.";
   }
 }
-
 // Define Complaint model schema if it doesn't exist yet
 const complaintSchema = new mongoose.Schema({
   title: {
@@ -106,6 +105,7 @@ const complaintSchema = new mongoose.Schema({
     }
   }]
 });
+
 
 // Create model if it doesn't exist yet
 let Complaint;
