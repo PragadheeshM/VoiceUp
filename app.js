@@ -769,6 +769,9 @@ app.post('/update-complaint-status', isLoggedIn, isOfficer, async (req, res) => 
     res.status(500).send('Error updating complaint status');
   }
 });
+
+// admin routes
+
 app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
   try {
     const officers = await usermodel.find({ role: 'OFFICER' });
@@ -796,8 +799,21 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
       }
     });
 
-    // Log statusData for debugging
+    // Aggregate complaint counts by category
+    const categoryCounts = await Complaint.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+      { $project: { category: '$_id', count: 1, _id: 0 } }
+    ]);
+
+    // Initialize categoryData as an object
+    const categoryData = {};
+    categoryCounts.forEach(({ category, count }) => {
+      categoryData[category || 'OTHER'] = count; // Handle null/undefined categories
+    });
+
+    // Log data for debugging
     console.log('Status Data:', statusData);
+    console.log('Category Data:', categoryData);
 
     // Transform complaints
     const transformedComplaints = await Promise.all(complaints.map(async complaint => {
@@ -822,6 +838,7 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
       citizens,
       complaints: transformedComplaints,
       statusData,
+      categoryData,
       layout: 'layout' // Explicitly set layout
     });
   } catch (error) {
@@ -833,6 +850,7 @@ app.get('/admin', isLoggedIn, isAdmin, async (req, res) => {
       citizens: [],
       complaints: [],
       statusData: { PENDING: 0, PROCESSING: 0, RESOLVED: 0, REJECTED: 0 },
+      categoryData: {}, // Add categoryData for error case
       layout: 'layout'
     });
   }
@@ -1149,7 +1167,7 @@ app.get('/assigned-complaints', isLoggedIn, isOfficer, async (req, res) => {
     });
   }
 });
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4002;
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

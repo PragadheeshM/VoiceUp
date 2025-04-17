@@ -14,7 +14,7 @@
 
 .chat-header {
     padding: 15px;
-    background: #73003b;
+    background: linear-gradient(135deg, #3f8d91 0%, #5a002f 100%);
     color: white;
     border-radius: 10px 10px 0 0;
     display: flex;
@@ -49,8 +49,8 @@
 }
 
 .message.user {
-    background: #73003b;
-    color: white;
+    background: rgb(201, 201, 201);
+    color: rgb(0, 0, 0);
     margin-left: auto;
 }
 
@@ -66,7 +66,7 @@
 
 .chat-input-container {
     padding: 15px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid beee;
     display: flex;
     gap: 10px;
 }
@@ -80,7 +80,7 @@
 
 .send-button {
     padding: 10px 20px;
-    background: #73003b;
+    background:linear-gradient(135deg, #3f8d91 0%, #5a002f 100%);
     color: white;
     border: none;
     border-radius: 5px;
@@ -88,7 +88,7 @@
 }
 
 .send-button:hover {
-    background: #5a002f;
+    background: linear-gradient(135deg, #3f8d91 0%, #5a002f 100%);
 }
 
 /* Chat toggle button */
@@ -98,7 +98,7 @@
     right: 20px;
     width: 60px;
     height: 60px;
-    background: #73003b;
+    background: linear-gradient(135deg, #3f8d91 0%, #5a002f 100%);
     color: white;
     border: none;
     border-radius: 50%;
@@ -112,7 +112,7 @@
 }
 
 .chat-toggle:hover {
-    background: #5a002f;
+    background: #b9cdd8;
 }
 
 .suggestion-list {
