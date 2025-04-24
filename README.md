@@ -100,8 +100,6 @@ This project is under the MIT License.
 Made with ❤️ for Hackathon – Empowering communities through tech.
 
 ```python
-Copy
-Edit
 
 ---
 
