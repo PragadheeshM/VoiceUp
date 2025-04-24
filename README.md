@@ -1,122 +1,104 @@
-# Government Complaint Portal
+# 🌐 VoiceUp – Complaint Portal with Multilingual Support & Admin Dashboard Insights
 
-A modern web application for citizens to file and track complaints, and for government officials to manage and respond to them efficiently.
+Welcome to **VoiceUp**, a complete web-based solution for managing user complaints with enhanced **multilingual support** and an **interactive admin dashboard** that provides real-time complaint analytics.
 
-## Features
+---
 
-- *User Authentication*
-  - Citizen registration and login
-  - Admin and Officer accounts
-  - Secure password hashing
-  - Session management
+## 🚀 Features
 
-- *Complaint Management*
-  - File new complaints with categorisation
-  - Prioritise complaints based on urgency
-  - Track complaint status
-  - View complaint history
-  - Add comments and updates
+### 🧑‍💻 User Features
+- 🔐 Secure login/signup system
+- 📬 Register complaints easily
+- 📜 View complaint history
+- 🌍 **Multilingual Interface** using Google Translate (Supports: Tamil, Hindi, Telugu, Kannada, Malayalam, Bengali, Marathi, English)
 
-- *Admin Dashboard*
-  - Manage user accounts
-  - Create officer accounts
-  - Monitor all complaints
-  - Update complaint statuses
+### 🛠️ Admin Features
+- 📋 View and manage all user complaints
+- 📊 **Dynamic visualizations** and complaint statistics
+- 🔍 Filter complaints by status, type, and more
 
-- *Modern UI*
-  - Responsive design using Tailwind CSS
-  - Clean and intuitive interface
+---
 
-## Tech Stack
+## 🗣️ Multilingual Support
 
-- *Backend*
-  - Node.js
-  - Express.js
-  - MongoDB
-  - JWT Authentication
-  - Bcrypt for password hashing
+We’ve integrated **Google Translate API** to allow users to interact with the website in their preferred Indian languages.
 
-- *Frontend*
-  - EJS Templates
-  - Tailwind CSS
-  - Express EJS Layouts
+### 💡 How It Works:
+- A simple dropdown is available at the top-right corner of the site.
+- User can choose their preferred language.
+- The entire page content updates in real-time without reloads.
+- Limited to selected languages for a cleaner experience.
 
-- *AI Integration*
-  - Google Gemini AI for chat support and complaint categorisation
+> ✅ Supported Languages: English, Tamil, Hindi, Telugu, Malayalam, Bengali, Kannada, Marathi
 
-## Prerequisites
+---
 
-- Node.js (v14 or higher)
-- MongoDB
-- Google Gemini API key
+## 📊 Admin Dashboard with Visual Insights
 
-## Installation
+The admin panel includes an **interactive dashboard** powered by visual charts to help monitor:
+- 📈 Number of complaints per day/week/month
+- 📌 Complaint categories
+- 🟢 Status overview (Pending, In Progress, Resolved)
 
-1. Clone the repository:
-bash
-git clone <repository-url>
-cd government-complaint-portal
+This provides a **quick, data-driven view** to improve complaint resolution efficiency.
 
+---
 
-2. Install dependencies:
-bash
+## 🧩 Tech Stack
+
+| Area        | Technology         |
+|-------------|--------------------|
+| Backend     | Node.js, Express    |
+| Frontend    | HTML, CSS, JS, EJS |
+| Database    | MongoDB             |
+| Charts      | Chart.js or Google Charts |
+| Multilingual| Google Translate Widget |
+
+---
+
+## 📦 Installation Guide
+
+1. **Clone the project**
+```bash
+git clone https://github.com/your-repo/projectz.git
+cd VoiceUp
+Install dependencies
+```
+```bash
 npm install
-
-
-3. Create a .env file in the root directory:
-env
-GEMINI_API_KEY=your_gemini_api_key
-
-
-4. Start MongoDB:
-bash
 mongod
-
-
-5. Run the application:
-bash
+```
+```bash
 node app.js
+```
 
 
-The application will be available at http://localhost:3000
+🛡️ Security & Performance
+Passwords hashed with bcrypt
 
-## Default Accounts
+JWT-based session handling
 
-- *Admin*
-  - Email: admin@example.com
-  - Password: admin123
+Input validation and sanitization
 
-- *Citizen*
-  - Register through the signup page
+✨ Additional  Enhancements
+🔔 Email/SMS notifications
 
+🧠 AI-powered priority classification
 
-## API Endpoints
+📞 Support
+For help or suggestions, open an issue or reach out to the dev team.
+E-mail:pragadheeshpragadheesh75@gmail.comm
 
-- POST /api/chat - AI chat endpoint
-- POST /complaints - File a new complaint
-- GET /my-complaints - View user's complaints
-- POST /update-complaint-status - Update complaint status (Admin/Officer only)
+📄 License
+This project is under the MIT License.
 
-## Security Features
+Made with ❤️ for Hackathon – Empowering communities through tech.
 
-- Password hashing with bcrypt
-- JWT-based authentication
-- Role-based access control
-- Secure cookie handling
-- Input validation
+```python
+Copy
+Edit
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create your feature branch (git checkout -b feature/AmazingFeature)
-3. Commit your changes (git commit -m 'Add some AmazingFeature')
-4. Push to the branch (git push origin feature/AmazingFeature)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the ISC License.
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the project maintainers.
+Let me know if you'd like a dark-themed version of this `README.md`, a version in Tamil/Hindi, or if you're planning to upload
+```
