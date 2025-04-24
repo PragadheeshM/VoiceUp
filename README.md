@@ -72,31 +72,33 @@ mongod
 node app.js
 ```
 
----
-🛡️ Security & Performance
 
+🛡️ Security & Performance
+---
 Passwords hashed with bcrypt
 
 JWT-based session handling
 
 Input validation and sanitization
----
-✨ Additional  Enhancements
 
+✨ Additional  Enhancements
+---
 🔔 Email/SMS notifications
 
 🧠 AI-powered priority classification
----
+
 📞 Support
+---
 For help or suggestions, open an issue or reach out to the dev team.
 
 E-mail:pragadheeshpragadheesh75@gmail.comm
----
+
 📄 License
+---
 This project is under the MIT License.
 
 Made with ❤️ for Hackathon – Empowering communities through tech.
----
+
 ```python
 Copy
 Edit
