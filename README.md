@@ -1,7 +1,7 @@
 # 🌐 VoiceUp – Complaint Portal with Multilingual Support & Admin Dashboard Insights
 
 Welcome to **VoiceUp**, a complete web-based solution for managing user complaints with enhanced **multilingual support** and an **interactive admin dashboard** that provides real-time complaint analytics.
-![VoiceUp Banner](./Downloads/homepage.png)
+![VoiceUp Banner](./homepage.jpg)
 ---
 
 ## 🚀 Features
@@ -89,7 +89,7 @@ Input validation and sanitization
 ## 📸 Screenshots
 
 ###  Complaints received 
-![Complaint received](./Downloads/complaints.png)
+![Complaint received](./complaints.png)
 
 📞 Support
 ---
